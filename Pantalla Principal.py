@@ -1,12 +1,25 @@
 import pygame
 from sys import exit
 
+class Mesa():
+    def __init__(self,image,size,localizacion,producto):
+        original=pygame.image.load(image)
+        self.image= pygame.transform.scale(original, size)
+        self.rectangulo=self.image.get_rect(bottomleft=localizacion)
+        self.producto=producto
+    def dibujar(self, screen):
+        screen.blit(self.image, self.rectangulo)
+    def get_localizacion(self):
+        return self.localizacion
+    def get_producto(self):
+        return self.producto
+        
 class Jugador():
-    def __init__(self,image,size, position):
+    def __init__(self,image,size, position, inventario):
         original=pygame.image.load(image)
         self.image= pygame.transform.scale(original, size)
         self.rectangulo=self.image.get_rect(bottomleft=position)
-        
+        self.inventario=inventario
 
     def moverse(self):
         keys = pygame.key.get_pressed()
@@ -18,7 +31,11 @@ class Jugador():
             self.rectangulo.x-=5
         if keys[pygame.K_RIGHT]:
             self.rectangulo.x+=5
+
+    
             
+            
+    
     def mantener_posicion(self):
         if self.rectangulo.x==0:
             self.rectangulo.x=5
@@ -47,10 +64,11 @@ class Juego():
         self.clock= pygame.time.Clock()
         self.cargar_imagenes()
         self.crear_jugador()
+        self.crear_mesas()
         
     def crear_jugador(self):
-        self.uno=Jugador('azul.png',(50,50),(700,310))
-        self.dos=Jugador('amongus.png',(50,50),(100,310))
+        self.uno=Jugador('azul.png',(50,50),(700,310),[])
+        self.dos=Jugador('amongus.png',(50,50),(100,310),[])
         self.jugador_seleccionado=self.uno
         
     def cambiar_jugador(self):
@@ -58,6 +76,9 @@ class Juego():
             self.jugador_seleccionado = self.dos
         else:
             self.jugador_seleccionado = self.uno
+
+    def crear_mesas(self):
+        self.mesauno=Mesa('mesa.png',(50,50),(100,50),'Carne')
             
             
            
@@ -78,33 +99,24 @@ class Juego():
         nuevo_tamano_cielo = (800, 300) 
         self.cielo = pygame.transform.scale(cielo_original, nuevo_tamano_cielo)
 
-#og_azul=pygame.image.load("azul.png")
-#azul_tamano = (50, 50) 
-#amongus_azul = pygame.transform.scale(og_azul, azul_tamano)
-#self.rectangulo=amongus_azul.get_rect(bottomleft=(700,310))
 
-#amongus_original = pygame.image.load("amongus.png")
-#nuevo_amongus = (50, 50) 
-#amongus = pygame.transform.scale(amongus_original, nuevo_amongus)
-#amongus_rectangulo=amongus.get_rect(center=(100,310))
-
-#personaje_superficie_x=0
-
-    def permitir_eventos(self):
-        
-
+    def permitir_eventos(self):        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
             if event.type == pygame.KEYDOWN:
+            
                 if event.key == pygame.K_r:
                     self.cambiar_jugador()
-        #if event.type==pygame.KEYDOWN:
-         #   if event.key== pygame.K_SPACE:
-          #      self.rectangulo.y-=10
-        #if event.type==pygame.KEDO:
-         #   print ('key up')
+                    
+                if event.key == pygame.K_j:
+                    if  self.jugador_seleccionado.rectangulo.colliderect(self.mesauno.rectangulo):
+                        self.jugador_seleccionado.inventario.append(self.mesauno.producto)
+                        print (self.jugador_seleccionado.inventario)
+                    else:
+                        pass
+
     def dibujar_fondo(self):
         
         
@@ -114,9 +126,11 @@ class Juego():
 
     def dibujar(self):
         self.dibujar_fondo()
+        self.mesauno.dibujar(self.screen)
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
         self.screen.blit(self.score, self.score_rect)
+        
 
     def actualizar(self):
         self.jugador_seleccionado.actualizar()
@@ -126,7 +140,6 @@ class Juego():
             self.permitir_eventos()
             self.actualizar()
             self.dibujar()
-           
             pygame.display.update()#actualiza el display
             self.clock.tick(60)#frames
 
