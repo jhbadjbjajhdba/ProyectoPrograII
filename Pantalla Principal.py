@@ -1,6 +1,26 @@
 import pygame
 from sys import exit
 
+class Alimento():
+    def __init__(self,nombre):
+        self.nombre=nombre
+        
+class Proteina(Alimento):
+    def __init__(self,coccion):
+        super().__init__(nombre)
+        self.coccion=coccion
+    def get_coccion(self):
+        return self.coccion
+    
+        
+class Vegetal(Alimento):
+    def __init__(self,tiempo_cortado):
+        super().__init__(nombre)
+        self.tiempo_cortado=tiempo_cortado
+    def get_tiempo_cortado(self):
+        return self.tiempo_cortado
+   
+
 class Mesa():
     def __init__(self,image,size,localizacion,producto):
         original=pygame.image.load(image)
@@ -31,8 +51,13 @@ class Jugador():
             self.rectangulo.x-=5
         if keys[pygame.K_RIGHT]:
             self.rectangulo.x+=5
-
+    def get_inventario(self):
+        return self.inventario
     
+    def coger(self,producto):
+        self.inventario.append(producto)
+        if len(self.get_inventario())>1:
+            self.inventario=(self.inventario[1:])
             
             
     
@@ -64,7 +89,9 @@ class Juego():
         self.clock= pygame.time.Clock()
         self.cargar_imagenes()
         self.crear_jugador()
+        self.lista_mesas=[]
         self.crear_mesas()
+        
         
     def crear_jugador(self):
         self.uno=Jugador('azul.png',(50,50),(700,310),[])
@@ -78,8 +105,14 @@ class Juego():
             self.jugador_seleccionado = self.uno
 
     def crear_mesas(self):
-        self.mesauno=Mesa('mesa.png',(50,50),(100,50),'Carne')
-            
+        self.mesauno=Mesa('mesa.png',(50,50),(100,50),'Carne cruda')
+        self.lista_mesas.append(self.mesauno)
+        self.mesados=Mesa('mesa.png',(50,50),(200,50),'lechuga')
+        self.lista_mesas.append(self.mesados)
+
+    def crear_alimentos(self):
+        self.uncooked_meat=Proteina('carne cruda',30)
+        self.vegetal_uno=Vegetal('lechuga',20)
             
            
                 
@@ -110,16 +143,14 @@ class Juego():
                 if event.key == pygame.K_r:
                     self.cambiar_jugador()
                     
-                if event.key == pygame.K_j:
-                    if  self.jugador_seleccionado.rectangulo.colliderect(self.mesauno.rectangulo):
-                        self.jugador_seleccionado.inventario.append(self.mesauno.producto)
-                        print (self.jugador_seleccionado.inventario)
-                    else:
-                        pass
+                if event.key == pygame.K_f:
+                    for i in self.lista_mesas:
+                        if  self.jugador_seleccionado.rectangulo.colliderect(i.rectangulo):
+                            producto=i.get_producto()
+                            self.jugador_seleccionado.coger(producto)
+                            print (self.jugador_seleccionado.inventario)
 
     def dibujar_fondo(self):
-        
-        
         self.screen.fill('Black')       
         self.screen.blit(self.cielo,(0,0))#es como el place
         self.screen.blit(self.pasto,(0,300))
@@ -127,6 +158,7 @@ class Juego():
     def dibujar(self):
         self.dibujar_fondo()
         self.mesauno.dibujar(self.screen)
+        self.mesados.dibujar(self.screen)
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
         self.screen.blit(self.score, self.score_rect)
