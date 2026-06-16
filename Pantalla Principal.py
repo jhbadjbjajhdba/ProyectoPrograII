@@ -44,6 +44,16 @@ class Mesa(Estacion):
             return self.bandeja[0]
         else:
             pass
+
+        
+class Platero(Estacion):
+    def __init__(self,image,size,localizacion):
+        super().__init__(image,size,localizacion)
+        self.bandeja=[]
+    def get_bandeja(self):
+        return self.bandeja
+        
+
     
 
 class Tabla(Estacion):
@@ -69,6 +79,7 @@ class Despensa():
     def __init__(self,image,size,localizacion):
         original=pygame.image.load(image)
         self.image= pygame.transform.scale(original, size)
+        self.localizacion=localizacion
         self.rectangulo=self.image.get_rect(bottomleft=localizacion)
     def dibujar(self, screen):
         screen.blit(self.image, self.rectangulo)
@@ -113,11 +124,9 @@ class Jugador():
     
     def coger(self,producto):
         self.inventario.append(producto)
-        if len(self.get_inventario())>1:
-            self.inventario=(self.inventario[1:])
-
+        
     def dejar(self):
-        if len(self.inventario)==1:
+        if len(self.inventario)!=0:
             del self.inventario[0]
           
     
@@ -151,6 +160,7 @@ class Juego():
         self.crear_jugador()
         self.lista_despensas=[]
         self.lista_mesas=[]
+        self.lista_plateros=[]
         self.crear_estaciones()
         
         
@@ -183,8 +193,8 @@ class Juego():
             self.lista_mesas.append(mesa)
 
         for f in range (10,400,60):
-            mesa=Mesa('mesa.png',(50,50),(735,f))
-            self.lista_mesas.append(mesa)
+            fer=Platero('mesa.png',(50,50),(735,f))
+            self.lista_plateros.append(fer)
            
                 
     def cargar_imagenes(self):
@@ -230,6 +240,26 @@ class Juego():
                                     del (j.bandeja[0])
                                     self.jugador_seleccionado.coger(producto)
                                     print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+                            else:
+                                pass
+                                    
+                    for f in self.lista_plateros:
+                        if  self.jugador_seleccionado.rectangulo.colliderect(f.rectangulo):
+                            if  len(self.jugador_seleccionado.inventario)>=1 and self.jugador_seleccionado.inventario[0].get_estado()==True:
+                                for a in self.jugador_seleccionado.inventario:
+                                    f.bandeja.append(a)
+                                print ('El platero tiene: ')
+                                for a in f.bandeja:
+                                    print ('platero',a)
+                                return self.jugador_seleccionado.dejar()
+                            elif len(self.jugador_seleccionado.inventario)==0 and len(f.bandeja)!=0:
+                                    producto=f.get_bandeja()
+                                    for q in f.bandeja:
+                                        self.jugador_seleccionado.coger(q)
+                                    for i in f.bandeja:
+                                        del (i)
+                                    for a in self.jugador_seleccionado.inventario:
+                                        print (a)
                     
                     if len(self.jugador_seleccionado.inventario)==1 and len(self.hornouno.bandeja)==0:
                             if self.jugador_seleccionado.rectangulo.colliderect(self.hornouno.rectangulo):
@@ -279,6 +309,8 @@ class Juego():
         self.tablauno.dibujar(self.screen)
         for i in self.lista_mesas:
             i.dibujar(self.screen)
+        for f in self.lista_plateros:
+            f.dibujar(self.screen)
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
         self.screen.blit(self.score, self.score_rect)
@@ -299,7 +331,7 @@ class Juego():
 #===================================================================================================================            
 class PantallaPrincipal():
     def __init__(self):
-        self.window=None
+        self.window = None
     def empezar(self):
         self.window.withdraw()
         juego=Juego()
