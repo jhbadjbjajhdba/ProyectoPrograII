@@ -107,6 +107,7 @@ class Jugador():
             self.rectangulo.x-=5
         if keys[pygame.K_RIGHT]:
             self.rectangulo.x+=5
+     
     def get_inventario(self):
         return self.inventario
     
@@ -121,14 +122,14 @@ class Jugador():
           
     
     def mantener_posicion(self):
-        if self.rectangulo.x==0:
-            self.rectangulo.x=5
-        if self.rectangulo.x==760:
-            self.rectangulo.x=755
-        if self.rectangulo.y==0:
-            self.rectangulo.y=5
-        if self.rectangulo.y==360:
-            self.rectangulo.y=355
+        if self.rectangulo.x==35:
+            self.rectangulo.x=40
+        if self.rectangulo.x==715:
+            self.rectangulo.x=710
+        if self.rectangulo.y==20:
+            self.rectangulo.y=25
+        if self.rectangulo.y==315:
+            self.rectangulo.y=310
 
     def actualizar(self):
         self.moverse()
@@ -143,7 +144,7 @@ class Jugador():
 class Juego():
     def __init__(self):
         pygame.init() #iniciar las partes de pygame
-        self.screen=pygame.display.set_mode((800,400))
+        self.screen=pygame.display.set_mode((810,400))
         pygame.display.set_caption('Overcooked')
         self.clock= pygame.time.Clock()
         self.cargar_imagenes()
@@ -173,27 +174,31 @@ class Juego():
         self.hornouno=Horno('horno.png',(50,50),(300,50))
         self.tablauno=Tabla('horno.png',(50,50),(400,50))
         
+        for i in range (10,400,60):
+            mesa=Mesa('mesa.png',(50,50),(10,i))
+            self.lista_mesas.append(mesa)
+            
+        for x in range (60,720,75):
+            mesa=Mesa('mesa.png',(50,50),(x,390))
+            self.lista_mesas.append(mesa)
 
-        self.mesauno=Mesa('mesa.png',(50,50),(10,150))
-        self.mesados=Mesa('mesa.png',(50,50),(10,200))
-        self.mesatres=Mesa('mesa.png',(50,50),(10,250))
-        self.lista_mesas.append(self.mesatres)
-        self.lista_mesas.append(self.mesauno)
-        self.lista_mesas.append(self.mesados)
+        for f in range (10,400,60):
+            mesa=Mesa('mesa.png',(50,50),(735,f))
+            self.lista_mesas.append(mesa)
            
                 
     def cargar_imagenes(self):
         
         self.font=pygame.font.Font('oswald.ttf',50)
-        self.score=self.font.render('Jueguito Prueba',False,'White')#texto,smooth, color
+        self.score=self.font.render('  ',False,'White')#texto,smooth, color
         self.score_rect=self.score.get_rect(center=(400,200))
         
         pasto_original = pygame.image.load("pasto.jpg")
-        nuevo_pasto = (800, 100) 
+        nuevo_pasto = (810, 100) 
         self.pasto = pygame.transform.scale(pasto_original, nuevo_pasto)
 
         cielo_original = pygame.image.load("cielo.jpg")
-        nuevo_tamano_cielo = (800, 300) 
+        nuevo_tamano_cielo = (810, 300) 
         self.cielo = pygame.transform.scale(cielo_original, nuevo_tamano_cielo)
 
 
@@ -272,9 +277,8 @@ class Juego():
         self.despensados.dibujar(self.screen)
         self.hornouno.dibujar(self.screen)
         self.tablauno.dibujar(self.screen)
-        self.mesauno.dibujar(self.screen)
-        self.mesados.dibujar(self.screen)
-        self.mesatres.dibujar(self.screen)
+        for i in self.lista_mesas:
+            i.dibujar(self.screen)
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
         self.screen.blit(self.score, self.score_rect)
