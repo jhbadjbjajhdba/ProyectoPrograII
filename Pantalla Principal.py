@@ -21,9 +21,6 @@ class Proteina(Alimento):
         return ('proteina')
  
     
-   
-
-    
 class Vegetal(Alimento):
     def __init__(self,nombre,preparacion,estado):
         super().__init__(nombre,preparacion,estado)
@@ -177,8 +174,10 @@ class Juego():
         self.tablauno=Tabla('horno.png',(50,50),(400,50))
         
 
-        self.mesauno=Mesa('mesa.png',(50,50),(100,150))
-        self.mesados=Mesa('mesa.png',(50,50),(100,200))
+        self.mesauno=Mesa('mesa.png',(50,50),(10,150))
+        self.mesados=Mesa('mesa.png',(50,50),(10,200))
+        self.mesatres=Mesa('mesa.png',(50,50),(10,250))
+        self.lista_mesas.append(self.mesatres)
         self.lista_mesas.append(self.mesauno)
         self.lista_mesas.append(self.mesados)
            
@@ -275,6 +274,7 @@ class Juego():
         self.tablauno.dibujar(self.screen)
         self.mesauno.dibujar(self.screen)
         self.mesados.dibujar(self.screen)
+        self.mesatres.dibujar(self.screen)
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
         self.screen.blit(self.score, self.score_rect)
@@ -317,7 +317,3 @@ class PantallaPrincipal():
         
 pg=PantallaPrincipal()
 pg.inicializar()
-        
-        
-        
-  
