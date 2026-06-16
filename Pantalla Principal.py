@@ -1,5 +1,6 @@
 import pygame
 from sys import exit
+import tkinter as tk
 
 class Alimento():
     def __init__(self,nombre,preparacion,estado):
@@ -29,36 +30,42 @@ class Vegetal(Alimento):
     def get_grupo_alimentario(self):
         return ('vegetal')
     
-    
-class Mesa():
+class Estacion():
     def __init__(self,image,size,localizacion):
         original=pygame.image.load(image)
         self.image= pygame.transform.scale(original, size)
         self.rectangulo=self.image.get_rect(bottomleft=localizacion)
-        self.superficie=[]
-    def get_superficie(self):
-        if len (self.superficie)==1:
-            return self.superficie[0]
+    def dibujar(self, screen):
+        screen.blit(self.image, self.rectangulo)
+    
+class Mesa(Estacion):
+    def __init__(self,image,size,localizacion):
+        super().__init__(image,size,localizacion)
+        self.bandeja=[]
+    def get_bandeja(self):
+        if len (self.bandeja)==1:
+            return self.bandeja[0]
         else:
             pass
-    def dibujar(self, screen):
-        screen.blit(self.image, self.rectangulo)
+    
 
-class Tabla():
-    pass
-class Horno():
+class Tabla(Estacion):
     def __init__(self,image,size,localizacion):
-        original=pygame.image.load(image)
-        self.image= pygame.transform.scale(original, size)
-        self.rectangulo=self.image.get_rect(bottomleft=localizacion)
+        super().__init__(image,size,localizacion)
         self.bandeja=[]
-    def dibujar(self, screen):
-        screen.blit(self.image, self.rectangulo)
-    def cocinar(self,producto):
-            
-            carnecocinada=Proteina('Bistec',0,True)
-            self.bandeja.append(carnecocinada)
-            print ('el horno tiene',self.bandeja[0])
+    def cocinar(self,producto):            
+        lechugapartida=Vegetal('Ensalada',0,True)
+        self.bandeja.append(lechugapartida)
+        print ('la tabla tiene',self.bandeja[0])
+
+class Horno(Estacion):
+    def __init__(self,image,size,localizacion):
+        super().__init__(image,size,localizacion)
+        self.bandeja=[]
+    def cocinar(self,producto):            
+        carnecocinada=Proteina('Bistec',0,True)
+        self.bandeja.append(carnecocinada)
+        print ('el horno tiene',self.bandeja[0])
     
 
 class Despensa():
@@ -66,7 +73,6 @@ class Despensa():
         original=pygame.image.load(image)
         self.image= pygame.transform.scale(original, size)
         self.rectangulo=self.image.get_rect(bottomleft=localizacion)
-     
     def dibujar(self, screen):
         screen.blit(self.image, self.rectangulo)
     def get_localizacion(self):
@@ -168,6 +174,8 @@ class Juego():
         self.lista_despensas.append(self.despensados)
 
         self.hornouno=Horno('horno.png',(50,50),(300,50))
+        self.tablauno=Tabla('horno.png',(50,50),(400,50))
+        
 
         self.mesauno=Mesa('mesa.png',(50,50),(100,150))
         self.mesados=Mesa('mesa.png',(50,50),(100,200))
@@ -209,13 +217,13 @@ class Juego():
                         
                     for j in self.lista_mesas:
                         if  self.jugador_seleccionado.rectangulo.colliderect(j.rectangulo):
-                            if len(j.superficie)==0 and len(self.jugador_seleccionado.inventario)==1:
-                                j.superficie.append(self.jugador_seleccionado.inventario[0])
-                                print ('La mesa tiene: ',j.superficie[0])
+                            if len(j.bandeja)==0 and len(self.jugador_seleccionado.inventario)==1:
+                                j.bandeja.append(self.jugador_seleccionado.inventario[0])
+                                print ('La mesa tiene: ',j.bandeja[0])
                                 return self.jugador_seleccionado.dejar()
-                            elif len(j.superficie)==1 and len(self.jugador_seleccionado.inventario)==0:
-                                    producto=j.get_superficie()
-                                    del (j.superficie[0])
+                            elif len(j.bandeja)==1 and len(self.jugador_seleccionado.inventario)==0:
+                                    producto=j.get_bandeja()
+                                    del (j.bandeja[0])
                                     self.jugador_seleccionado.coger(producto)
                                     print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
                     
@@ -234,6 +242,22 @@ class Juego():
                                     self.jugador_seleccionado.coger(producto)
                                     del (self.hornouno.bandeja[0])
                                     print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+
+                    if len(self.jugador_seleccionado.inventario)==1 and len(self.tablauno.bandeja)==0:
+                            if self.jugador_seleccionado.rectangulo.colliderect(self.tablauno.rectangulo):
+                                if self.jugador_seleccionado.inventario[0].estado==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('vegetal'):
+                                    elemento=self.jugador_seleccionado.inventario[0]
+                                    del (self.jugador_seleccionado.inventario[0])
+                                    
+                                    return self.tablauno.cocinar(elemento)
+                       
+                    elif len(self.jugador_seleccionado.inventario)==0:
+                            if len(self.tablauno.bandeja)==1:
+                                if  self.jugador_seleccionado.rectangulo.colliderect(self.tablauno.rectangulo):
+                                    producto=self.tablauno.bandeja[0]
+                                    self.jugador_seleccionado.coger(producto)
+                                    del (self.tablauno.bandeja[0])
+                                    print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
                                 
                             
                             
@@ -248,6 +272,7 @@ class Juego():
         self.despensauno.dibujar(self.screen)
         self.despensados.dibujar(self.screen)
         self.hornouno.dibujar(self.screen)
+        self.tablauno.dibujar(self.screen)
         self.mesauno.dibujar(self.screen)
         self.mesados.dibujar(self.screen)
         self.uno.dibujar(self.screen)
@@ -266,8 +291,32 @@ class Juego():
             pygame.display.update()#actualiza el display
             self.clock.tick(60)#frames
 
-juego=Juego()
-juego.correr()
+
+#===================================================================================================================            
+class PantallaPrincipal():
+    def __init__(self):
+        self.window=None
+    def empezar(self):
+        self.window.withdraw()
+        juego=Juego()
+        juego.correr()
+        
+    def inicializar(self):
+        self.window=tk.Tk()
+        self.window.geometry('800x400')
+        self.window.title('Undercooked')
+        self.window.resizable(False,False)
+        titulo=tk.Label()
+        boton_iniciar=tk.Button(self.window, text='Iniciar', font=('Papyrus',12),command=self.empezar)
+        titulo=tk.Label(self.window,text=('UNDERCOOKED: The Video Game'),fg='black',font=(35), compound='bottom')
+        titulo.place(x=100,y=10)
+        boton_iniciar.place(x=200,y=200)
+        self.window.mainloop()
+        
+    
+        
+pg=PantallaPrincipal()
+pg.inicializar()
         
         
         
