@@ -52,7 +52,11 @@ class Platero(Estacion):
         self.bandeja=[]
     def get_bandeja(self):
         return self.bandeja
-        
+
+class Basurero(Estacion):
+    def __init__(self,image,size,localizacion):
+        super().__init__(image,size,localizacion)
+        self.bandeja=[]
 
     
 
@@ -183,6 +187,8 @@ class Juego():
 
         self.hornouno=Horno('horno.png',(50,50),(300,50))
         self.tablauno=Tabla('horno.png',(50,50),(400,50))
+
+        self.basurero=Basurero('basurero.png',(50,50),(500,50))
         
         for i in range (10,400,60):
             mesa=Mesa('mesa.png',(50,50),(10,i))
@@ -203,13 +209,13 @@ class Juego():
         self.score=self.font.render('  ',False,'White')#texto,smooth, color
         self.score_rect=self.score.get_rect(center=(400,200))
         
-        pasto_original = pygame.image.load("pasto.jpg")
-        nuevo_pasto = (810, 100) 
-        self.pasto = pygame.transform.scale(pasto_original, nuevo_pasto)
+        #pasto_original = pygame.image.load("pasto.jpg")
+        #nuevo_pasto = (810, 100) 
+        #self.pasto = pygame.transform.scale(pasto_original, nuevo_pasto)
 
-        cielo_original = pygame.image.load("cielo.jpg")
-        nuevo_tamano_cielo = (810, 300) 
-        self.cielo = pygame.transform.scale(cielo_original, nuevo_tamano_cielo)
+        #cielo_original = pygame.image.load("cielo.jpg")
+        #nuevo_tamano_cielo = (810, 300) 
+        #self.cielo = pygame.transform.scale(cielo_original, nuevo_tamano_cielo)
 
 
     def permitir_eventos(self):        
@@ -256,10 +262,9 @@ class Juego():
                                     producto=f.get_bandeja()
                                     for q in f.bandeja:
                                         self.jugador_seleccionado.coger(q)
-                                    for i in f.bandeja:
-                                        del (i)
                                     for a in self.jugador_seleccionado.inventario:
                                         print (a)
+                                    f.bandeja.clear()
                     
                     if len(self.jugador_seleccionado.inventario)==1 and len(self.hornouno.bandeja)==0:
                             if self.jugador_seleccionado.rectangulo.colliderect(self.hornouno.rectangulo):
@@ -282,7 +287,6 @@ class Juego():
                                 if self.jugador_seleccionado.inventario[0].estado==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('vegetal'):
                                     elemento=self.jugador_seleccionado.inventario[0]
                                     del (self.jugador_seleccionado.inventario[0])
-                                    
                                     return self.tablauno.cocinar(elemento)
                        
                     elif len(self.jugador_seleccionado.inventario)==0:
@@ -293,19 +297,23 @@ class Juego():
                                     del (self.tablauno.bandeja[0])
                                     print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
                                 
-                            
-                            
+                    if len(self.jugador_seleccionado.inventario)>=1:
+                            if self.jugador_seleccionado.rectangulo.colliderect(self.basurero.rectangulo):
+                                    self.jugador_seleccionado.inventario.clear()
+                                    print (self.jugador_seleccionado.inventario)
 
     def dibujar_fondo(self):
-        self.screen.fill('Black')       
-        self.screen.blit(self.cielo,(0,0))#es como el place
-        self.screen.blit(self.pasto,(0,300))
+        self.screen.fill('White')       
+
+       # self.screen.blit(self.cielo,(0,0))#es como el place
+        #self.screen.blit(self.pasto,(0,300))
 
     def dibujar(self):
         self.dibujar_fondo()
         self.despensauno.dibujar(self.screen)
         self.despensados.dibujar(self.screen)
         self.hornouno.dibujar(self.screen)
+        self.basurero.dibujar(self.screen)
         self.tablauno.dibujar(self.screen)
         for i in self.lista_mesas:
             i.dibujar(self.screen)
