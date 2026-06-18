@@ -2,8 +2,6 @@ import pygame
 from sys import exit
 import tkinter as tk
 import random
-def nexto():
-    print ('hola')
 class Receta():
     def __init__(self, ingredientes):
         self.ingredientes = ingredientes
@@ -55,6 +53,8 @@ class Alimento():
         return self.preparacion
     def get_estado(self):
         return self.estado
+    def get_nombre(self):
+        return self.nombre
         
 class Proteina(Alimento):
     def __init__(self,nombre,preparacion,estado):
@@ -92,18 +92,7 @@ class Mesa(Estacion):
 class Entrega(Estacion):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
-    def comparar(self,producto):
-        self.producto=[]
-        comprobado =False
-        for i in self.lista_recetas:
-            if self.producto==i:
-                comprobado=True
-        comprobado=False
-        if comprobado:
-            for i in producto:
-                puntaje+=10
-                print (self.puntaje)
-        
+    
     
 class Platero(Estacion):
     def __init__(self,image,size,localizacion):
@@ -288,7 +277,7 @@ class Juego():
     def contar_inventario(self):
         conteo = {}
         for producto in self.jugador_seleccionado.inventario:
-            nombre = producto.nombre
+            nombre = producto.get_nombre()
             if nombre not in conteo:
                 conteo[nombre] = 1
             else:
