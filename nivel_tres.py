@@ -56,7 +56,13 @@ class Alimento():
     def get_nombre(self):
         return self.nombre
         
-    
+class Proteina(Alimento):
+    def __init__(self,nombre,preparacion):
+        super().__init__(nombre,preparacion)
+    def get_grupo_alimentario(self):
+        return ('proteina')
+    def get_estado(self):
+        return False   
  
 class Vegetal(Alimento):
     def __init__(self,nombre,preparacion):
@@ -66,21 +72,38 @@ class Vegetal(Alimento):
     def get_estado(self):
         return False
 
-class Puré(Alimento):
+class Papas_Cortadas(Alimento):
     def __init__(self,nombre,preparacion):
         super().__init__(nombre,preparacion)
     def get_grupo_alimentario(self):
-        return ('pure')
+        return ('vegetal')
     def get_estado(self):
         return ('Semilisto')
 
-class Sopa(Alimento):
+class Papas_Fritas(Alimento):
     def __init__(self,nombre,preparacion):
         super().__init__(nombre,preparacion)
     def get_grupo_alimentario(self):
-        return ('sopa')
+        return ('vegetal')
     def get_estado(self):
-        return ('True')
+        return True
+
+class Pescado(Alimento):
+    def __init__(self,nombre,preparacion):
+        super().__init__(nombre,preparacion)
+    def get_grupo_alimentario(self):
+        return ('proteina')
+    def get_estado(self):
+        return ('Semilisto')
+    
+class Pescado_Empanizado(Alimento):
+    def __init__(self,nombre,preparacion):
+        super().__init__(nombre,preparacion)
+    def get_grupo_alimentario(self):
+        return ('proteina')
+    def get_estado(self):
+        return True
+    
 class Estacion():
     def __init__(self,image,size,localizacion):
         original=pygame.image.load(image)
@@ -116,7 +139,7 @@ class Basurero(Estacion):
         super().__init__(image,size,localizacion)
         self.bandeja=[]    
 
-class Tabla(Estacion):
+class Tabla_vegetales(Estacion):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
         self.bandeja=[]
@@ -128,11 +151,11 @@ class Tabla(Estacion):
             self.producto_a_cocinar = producto
             self.temporizador = Temporizador(producto.get_preparacion())
             self.temporizador.iniciar()
-            print("Cortando vegetal...")
+            print("preparando ingrediente...")
     def actualizar(self):
         if self.temporizador.terminar():
-            pure = Puré("Puré de " + self.producto_a_cocinar.get_nombre(), 5000)
-            self.bandeja.append(pure)
+            papas_tiras = Papas_Cortadas('Papas cortadas', 5000)
+            self.bandeja.append(papas_tiras)
             self.producto_a_cocinar = None
             print("La tabla tiene:", self.bandeja[0])
             
@@ -142,7 +165,8 @@ class Tabla(Estacion):
     def esta_cocinando(self):
         return self.temporizador.esta_activo()
 
-class Horno(Estacion):
+    
+class Tabla_pescado(Estacion):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
         self.bandeja=[]
@@ -154,14 +178,67 @@ class Horno(Estacion):
             self.producto_a_cocinar = producto
             self.temporizador = Temporizador(producto.get_preparacion())
             self.temporizador.iniciar()
-            print("Hirviendo Puré...")
+            print("preparando ingrediente...")
+    def actualizar(self):
+        if self.temporizador.terminar():
+            pescado_machacado = Pescado('Pescado', 5000)
+            self.bandeja.append(pescado_machacado)
+            self.producto_a_cocinar = None
+            print("La tabla tiene:", self.bandeja[0])
+            
+    def get_tiempo_restante(self):
+        return self.temporizador.mostrar_tiempo()
+
+    def esta_cocinando(self):
+        return self.temporizador.esta_activo()
+
+class Freidora_Pescado(Estacion):
+    def __init__(self,image,size,localizacion):
+        super().__init__(image,size,localizacion)
+        self.bandeja=[]
+        self.temporizador=Temporizador(0)
+        self.producto_a_cocinar=None
+        
+    def cocinar(self,producto):
+        if len(self.bandeja) == 0 and self.producto_a_cocinar == None:
+            self.producto_a_cocinar = producto
+            self.temporizador = Temporizador(producto.get_preparacion())
+            self.temporizador.iniciar()
+            print("Friendo")
     def actualizar(self):
     
         if self.temporizador.terminar():
-            sopa = Sopa("Sopa " + self.producto_a_cocinar.get_nombre(), 0)
-            self.bandeja.append(sopa)
+            pescado= Pescado_Empanizado('Pescado Empanizado', 0)
+            self.bandeja.append(pescado)
             self.producto_a_cocinar = None
-            print("El horno tiene:", self.bandeja[0])
+            print("La freidora de pescado tiene:", self.bandeja[0])
+            
+    def get_tiempo_restante(self):
+        return self.temporizador.mostrar_tiempo()
+
+    def esta_cocinando(self):
+        return self.temporizador.esta_activo()
+    
+class Freidora_Papas(Estacion):
+    def __init__(self,image,size,localizacion):
+        super().__init__(image,size,localizacion)
+        self.bandeja=[]
+        self.temporizador=Temporizador(0)
+        self.producto_a_cocinar=None
+        
+    def cocinar(self,producto):
+        if len(self.bandeja) == 0 and self.producto_a_cocinar == None:
+            self.producto_a_cocinar = producto
+            self.temporizador = Temporizador(producto.get_preparacion())
+            self.temporizador.iniciar()
+            print("Friendo")
+    def actualizar(self):
+    
+        if self.temporizador.terminar():
+            fritas= Papas_Fritas('Papas Fritas', 0)
+            self.bandeja.append(fritas)
+            self.producto_a_cocinar = None
+            print("La freidora de papas tiene:", self.bandeja[0])
             
     def get_tiempo_restante(self):
         return self.temporizador.mostrar_tiempo()
@@ -185,14 +262,14 @@ class Despensa():
 class Despensa_Tomate(Despensa):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
-        self.producto=Vegetal('Tomate',5000)
+        self.producto=Proteina('Pez',5000)
     def get_producto(self):
         return self.producto
     
 class Despensa_Papa(Despensa):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
-        self.producto=Vegetal('Cebolla',5000)
+        self.producto=Vegetal('Papas',5000)
     def get_producto(self):
         return self.producto
     
@@ -257,7 +334,6 @@ class Juego():
         self.fuente=pygame.font.SysFont('oswald',22)
         self.cargar_imagenes()
         self.crear_jugador()
-        self.lista_hornos=[]
         self.lista_despensas=[]
         self.lista_mesas=[]
         self.lista_plateros=[]
@@ -265,7 +341,6 @@ class Juego():
         self.crear_estaciones()
         self.lista_recetas=[]
         self.puntaje=0
-        
         self.generar_receta()
         self.temporizador=Temporizador(100000)
         self.temporizador.iniciar()
@@ -311,7 +386,7 @@ class Juego():
             self.puntaje-=10
             self.jugador_seleccionado.inventario.clear()
     def generar_receta(self):
-        ingredientes_posibles = ["Sopa Puré de Tomate", "Sopa Puré de Cebolla"]
+        ingredientes_posibles = ["Pescado Empanizado", "Papas Fritas"]
         receta = {}
         for ingrediente in ingredientes_posibles:
             cantidad = random.randint(0, 1)
@@ -332,11 +407,11 @@ class Juego():
         self.despensados=Despensa_Papa('mesa.png',(50,50),(10,250))
         self.lista_despensas.append(self.despensados)
 
-        self.hornouno=Horno('olla.jpeg',(50,50),(300,50))
-        self.hornodos=Horno('olla.jpeg',(50,50),(230,50))
-        self.lista_hornos.append(self.hornouno)
-        self.lista_hornos.append(self.hornodos)
-        self.tablauno=Tabla('cortadora_dos.png',(50,50),(400,50))
+        self.hornouno=Freidora_Pescado('freidora.jpeg',(50,50),(280,50))
+        self.hornodos=Freidora_Papas('freidora.jpeg',(50,50),(200,50))
+        
+        self.tablauno=Tabla_vegetales('cortadora_dos.png',(50,50),(350,50))
+        self.tablados=Tabla_pescado('cortadora_dos.png',(50,50),(410,50))
 
         self.basurero=Basurero('basurero.png',(50,50),(500,50))
 
@@ -418,37 +493,79 @@ class Juego():
                                     for a in self.jugador_seleccionado.inventario:
                                         print (a)
                                     
-                                    
-                    for f in self.lista_hornos:
-                        if len(self.jugador_seleccionado.inventario)==1 and len(f.bandeja)==0:
-                            if self.jugador_seleccionado.rectangulo.colliderect(f.rectangulo):
-                                if self.jugador_seleccionado.inventario[0].get_estado()==('Semilisto') and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('pure'):
+                    if self.jugador_seleccionado.rectangulo.colliderect(self.hornouno.rectangulo):            
+                            if len(self.jugador_seleccionado.inventario)==1 and len(self.hornouno.bandeja)==0:
+                                if self.jugador_seleccionado.inventario[0].get_estado()==('Semilisto') and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('proteina'):
                                     elemento=self.jugador_seleccionado.inventario[0]
                                     del (self.jugador_seleccionado.inventario[0])
-                                    return f.cocinar(elemento)
+                                    return self.hornouno.cocinar(elemento)
+                       
+                            elif len(self.jugador_seleccionado.inventario)==0:
+                                if len(self.hornouno.bandeja)==1:
+                                    
+                                        producto=self.hornouno.bandeja[0]
+                                        self.jugador_seleccionado.coger(producto)
+                                        del (self.hornouno.bandeja[0])
+                                        print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+
+                    elif self.jugador_seleccionado.rectangulo.colliderect(self.hornodos.rectangulo):            
+                            if len(self.jugador_seleccionado.inventario)==1 and len(self.hornodos.bandeja)==0:
+                            
+                                if self.jugador_seleccionado.inventario[0].get_estado()==('Semilisto') and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('vegetal'):
+                                    elemento=self.jugador_seleccionado.inventario[0]
+                                    del (self.jugador_seleccionado.inventario[0])
+                                    return self.hornodos.cocinar(elemento)
+                       
+                            elif len(self.jugador_seleccionado.inventario)==0:
+                                if len(self.hornodos.bandeja)==1:
+                                    
+                                        producto=self.hornodos.bandeja[0]
+                                        self.jugador_seleccionado.coger(producto)
+                                        del (self.hornodos.bandeja[0])
+                                        print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+
+
+
+
+
+
+
+                    if self.jugador_seleccionado.rectangulo.colliderect(self.tablauno.rectangulo):
+                        if len(self.jugador_seleccionado.inventario)==1 and len(self.tablauno.bandeja)==0:
+                            if self.jugador_seleccionado.inventario[0].get_estado()==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('vegetal'):
+                                elemento=self.jugador_seleccionado.inventario[0]
+                                del (self.jugador_seleccionado.inventario[0])
+                                return self.tablauno.cocinar(elemento)
                        
                         elif len(self.jugador_seleccionado.inventario)==0:
-                            if len(f.bandeja)==1:
-                                if  self.jugador_seleccionado.rectangulo.colliderect(f.rectangulo):
-                                    producto=f.bandeja[0]
+                            if len(self.tablauno.bandeja)==1:
+                                producto=self.tablauno.bandeja[0]
+                                self.jugador_seleccionado.coger(producto)
+                                del (self.tablauno.bandeja[0])
+                                print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+
+
+
+
+                    if self.jugador_seleccionado.rectangulo.colliderect(self.tablados.rectangulo):
+                        if len(self.jugador_seleccionado.inventario)==1 and len(self.tablados.bandeja)==0:
+                            if self.jugador_seleccionado.inventario[0].get_estado()==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('proteina'):
+                                elemento=self.jugador_seleccionado.inventario[0]
+                                del (self.jugador_seleccionado.inventario[0])
+                                return self.tablados.cocinar(elemento)
+                       
+                        elif len(self.jugador_seleccionado.inventario)==0:
+                            if len(self.tablados.bandeja)==1:
+                                    producto=self.tablados.bandeja[0]
                                     self.jugador_seleccionado.coger(producto)
-                                    del (f.bandeja[0])
+                                    del (self.tablados.bandeja[0])
                                     print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
 
-                    if len(self.jugador_seleccionado.inventario)==1 and len(self.tablauno.bandeja)==0:
-                            if self.jugador_seleccionado.rectangulo.colliderect(self.tablauno.rectangulo):
-                                if self.jugador_seleccionado.inventario[0].get_estado()==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('vegetal'):
-                                    elemento=self.jugador_seleccionado.inventario[0]
-                                    del (self.jugador_seleccionado.inventario[0])
-                                    return self.tablauno.cocinar(elemento)
-                       
-                    elif len(self.jugador_seleccionado.inventario)==0:
-                            if len(self.tablauno.bandeja)==1:
-                                if  self.jugador_seleccionado.rectangulo.colliderect(self.tablauno.rectangulo):
-                                    producto=self.tablauno.bandeja[0]
-                                    self.jugador_seleccionado.coger(producto)
-                                    del (self.tablauno.bandeja[0])
-                                    print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+
+
+
+
+
                                 
                     if len(self.jugador_seleccionado.inventario)>=1:
                             if self.jugador_seleccionado.rectangulo.colliderect(self.basurero.rectangulo):
@@ -480,6 +597,7 @@ class Juego():
         self.hornodos.dibujar(self.screen)
         self.basurero.dibujar(self.screen)
         self.tablauno.dibujar(self.screen)
+        self.tablados.dibujar(self.screen)
         self.entrega.dibujar(self.screen)
         for i in self.lista_mesas:
             i.dibujar(self.screen)
@@ -489,17 +607,34 @@ class Juego():
         tiempo = self.temporizador.mostrar_tiempo()
         texto_tiempo = self.fuente.render(f"Tiempo: {tiempo}", False, "Black")
         self.screen.blit(texto_tiempo, (810, 20))
-        for f in self.lista_hornos:
-            if f.esta_cocinando():
-                self.hornotres=Horno('olla_dos.jpeg',(50,50),(300,50))
+        
+        if self.hornouno.esta_cocinando():
+                self.hornotres=Freidora_Pescado('freidora_dos.jpeg',(50,50),(280,50))
                 self.hornotres.dibujar(self.screen)
-                tiempo_horno = f.get_tiempo_restante()
+                tiempo_horno = self.hornouno.get_tiempo_restante()
                 texto_horno = self.fuente.render(f"Horno: {tiempo_horno}", False, "Black")
-                self.screen.blit(texto_horno, (f.rectangulo.x, f.rectangulo.y +50))
+                self.screen.blit(texto_horno, (self.hornouno.rectangulo.x, self.hornouno.rectangulo.y +50))
+                
+        if self.hornodos.esta_cocinando():
+                self.hornocuatro=Freidora_Pescado('freidora_dos.jpeg',(50,50),(200,50))
+                self.hornocuatro.dibujar(self.screen)
+                tiempo_horno = self.hornodos.get_tiempo_restante()
+                texto_horno = self.fuente.render(f"Horno: {tiempo_horno}", False, "Black")
+                self.screen.blit(texto_horno, (self.hornodos.rectangulo.x, self.hornodos.rectangulo.y +50))
+
+                
         if self.tablauno.esta_cocinando():
             tiempo_tabla = self.tablauno.get_tiempo_restante()
             texto_tabla = self.fuente.render(f"Tabla: {tiempo_tabla}", False, "Black")
-            self.screen.blit(texto_tabla, (400, 60))
+            self.screen.blit(texto_tabla, (350, 60))
+
+        if self.tablados.esta_cocinando():
+            tiempo_tabla = self.tablados.get_tiempo_restante()
+            texto_tabla = self.fuente.render(f"Tabla: {tiempo_tabla}", False, "Black")
+            self.screen.blit(texto_tabla, (410, 60))
+
+
+            
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
         
@@ -524,9 +659,11 @@ class Juego():
 
     def actualizar(self):
         self.jugador_seleccionado.actualizar()
-        for horno in self.lista_hornos:
-            horno.actualizar()
+        
+        self.hornouno.actualizar()
+        self.hornodos.actualizar()
         self.tablauno.actualizar()
+        self.tablados.actualizar()
         if self.temporizador_receta.terminar():
             self.generar_receta()
             self.temporizador_receta.iniciar()
