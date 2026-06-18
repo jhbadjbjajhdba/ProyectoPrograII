@@ -410,32 +410,32 @@ class Juego():
         self.hornouno=Freidora_Pescado('freidora.jpeg',(50,50),(280,50))
         self.hornodos=Freidora_Papas('freidora.jpeg',(50,50),(200,50))
         
-        self.tablauno=Tabla_vegetales('cortadora_dos.png',(50,50),(350,50))
-        self.tablados=Tabla_pescado('cortadora_dos.png',(50,50),(410,50))
+        self.tablauno=Tabla_vegetales('cortadora_tres.png',(50,50),(350,50))
+        self.tablados=Tabla_pescado('cortadora_tres.png',(50,50),(410,50))
 
         self.basurero=Basurero('basurero.png',(50,50),(500,50))
 
         self.entrega=Entrega('banda.png',(50,50),(600,50))
         
         for i in range (60,200,60):
-            mesa=Mesa('mesa_trasera_dos.jpeg',(50,50),(10,i))
+            mesa=Mesa('mesa_trasera_tres.jpeg',(50,50),(10,i))
             self.lista_mesas.append(mesa)
         for i in range (300,400,60):
-            mesa=Mesa('mesa_trasera_dos.jpeg',(50,50),(10,i))
+            mesa=Mesa('mesa_trasera_tres.jpeg',(50,50),(10,i))
             self.lista_mesas.append(mesa)
             
         for x in range (70,720,75):
-            mesa=Mesa('mesa_trasera_dos.jpeg',(50,50),(x,400))
+            mesa=Mesa('mesa_trasera_tres.jpeg',(50,50),(x,400))
             self.lista_mesas.append(mesa)
 
         for f in range (60,400,60):
-            fer=Platero('platero_dos.jpeg',(50,50),(735,f))
+            fer=Platero('platero_tres.jpeg',(50,50),(735,f))
             self.lista_plateros.append(fer)
                
     def cargar_imagenes(self):
         self.font=pygame.font.Font('oswald.ttf',50)
         self.score=self.font.render('  ',False,'White')#texto,smooth, color
-        cielo_original = pygame.image.load("cielo_dos.png")
+        cielo_original = pygame.image.load("cielo_tres.png")
         nuevo_tamano_cielo = (800, 400)
         self.cielo = pygame.transform.scale(cielo_original, nuevo_tamano_cielo)
         self.score_rect=self.score.get_rect(center=(400,200))
