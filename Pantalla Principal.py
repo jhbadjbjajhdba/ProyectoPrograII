@@ -1,19 +1,26 @@
 import pygame
 from sys import exit
 import tkinter as tk
-import time
-
+import random
+def nexto():
+    print ('hola')
 class Receta():
-    def __init__(self,lista_ingredientes):
-        self.lista_ingredientes=lista_ingredientes
-    def comparar_receta(self):
-        pass
+    def __init__(self, ingredientes):
+        self.ingredientes = ingredientes
+    def mostrar_receta(self):
+        print("Receta generada:")
+        for ingrediente, cantidad in self.ingredientes.items():
+            print(ingrediente, "x", cantidad)
+        
         
 class Temporizador():
     def __init__(self,duracion):
-        self.duracion=duracion
         self.tiempo_inicio=0
+        self.duracion=duracion
         self.activo = False
+    def get_tiempo_actual(self):
+        tiempo_actual =pygame.time.get_ticks()
+        return tiempo_actual
     def iniciar(self):
         self.tiempo_inicio=pygame.time.get_ticks()
         self.activo = True
@@ -85,16 +92,24 @@ class Mesa(Estacion):
 class Entrega(Estacion):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
-        self.puntaje=0
     def comparar(self,producto):
-        self.puntaje+=10
-        print (self.puntaje)
+        self.producto=[]
+        comprobado =False
+        for i in self.lista_recetas:
+            if self.producto==i:
+                comprobado=True
+        comprobado=False
+        if comprobado:
+            for i in producto:
+                puntaje+=10
+                print (self.puntaje)
         
     
 class Platero(Estacion):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
         self.bandeja=[]
+        
     def get_bandeja(self):
         return self.bandeja
 
@@ -241,28 +256,73 @@ class Juego():
         self.screen=pygame.display.set_mode((900,400))
         pygame.display.set_caption('Overcooked')
         self.clock= pygame.time.Clock()
-        self.fuente=pygame.font.SysFont('oswald',20)
+        self.fuente=pygame.font.SysFont('oswald',22)
         self.cargar_imagenes()
         self.crear_jugador()
         self.lista_despensas=[]
         self.lista_mesas=[]
         self.lista_plateros=[]
+        self.lista_ingredientes_listos=[]
         self.crear_estaciones()
+        self.lista_recetas=[]
+        self.puntaje=0
+        self.generar_receta()
         self.temporizador=Temporizador(100000)
         self.temporizador.iniciar()
+        self.temporizador_receta = Temporizador(25000)
+        self.temporizador_receta.iniciar()
         self.permitir=True
         
     def crear_jugador(self):
-        self.uno=Jugador('uno.jpeg',(50,50),(700,310),[])
-        self.dos=Jugador('dos.jpeg',(50,50),(100,310),[])
+        self.uno=Jugador('uno.png',(60,60),(700,310),[])
+        self.dos=Jugador('dos.png',(60,60),(100,310),[])
         self.jugador_seleccionado=self.uno
+    
         
     def cambiar_jugador(self):
         if self.jugador_seleccionado == self.uno:
             self.jugador_seleccionado = self.dos
         else:
             self.jugador_seleccionado = self.uno
+            
+    def contar_inventario(self):
+        conteo = {}
+        for producto in self.jugador_seleccionado.inventario:
+            nombre = producto.nombre
+            if nombre not in conteo:
+                conteo[nombre] = 1
+            else:
+                conteo[nombre] += 1
+        return conteo
+    
+    def entregar_pedido(self):
+        inventario_contado = self.contar_inventario()
 
+        if inventario_contado == self.receta_actual.ingredientes:
+            print("Pedido correcto")
+            self.puntaje += 10
+            print("Puntaje:", self.puntaje)
+            self.jugador_seleccionado.inventario.clear()
+            
+        else:
+            self.puntaje-=10
+            
+    def generar_receta(self):
+        ingredientes_posibles = ["Bistec", "Ensalada"]
+        receta = {}
+        for ingrediente in ingredientes_posibles:
+            cantidad = random.randint(0, 2)
+            if cantidad > 0:
+                receta[ingrediente] = cantidad
+        if len(receta) == 0:
+            ingrediente = random.choice(ingredientes_posibles)
+            receta[ingrediente] = 1
+
+        self.receta_actual = Receta(receta)
+        self.lista_recetas.append(self.receta_actual)
+        self.receta_actual.mostrar_receta()
+        
+    
     def crear_estaciones(self):
         self.despensauno=Despensa_Proteina('mesa.png',(50,50),(100,50))
         self.lista_despensas.append(self.despensauno)
@@ -276,22 +336,22 @@ class Juego():
 
         self.entrega=Entrega('banda.png',(50,50),(600,50))
         
-        for i in range (10,400,60):
-            mesa=Mesa('mesa.png',(50,50),(10,i))
+        for i in range (60,400,60):
+            mesa=Mesa('mesa_trasera.jpeg',(50,50),(10,i))
             self.lista_mesas.append(mesa)
             
         for x in range (70,720,75):
-            mesa=Mesa('mesa.png',(50,50),(x,400))
+            mesa=Mesa('mesa_trasera.jpeg',(50,50),(x,400))
             self.lista_mesas.append(mesa)
 
-        for f in range (10,400,60):
-            fer=Platero('mesa.png',(50,50),(735,f))
+        for f in range (60,400,60):
+            fer=Platero('platero.jpeg',(50,50),(735,f))
             self.lista_plateros.append(fer)
                
     def cargar_imagenes(self):
         self.font=pygame.font.Font('oswald.ttf',50)
-        self.score=self.font.render('  ',False,'Grey')#texto,smooth, color
-        cielo_original = pygame.image.load("cielo.jpg")
+        self.score=self.font.render('  ',False,'White')#texto,smooth, color
+        cielo_original = pygame.image.load("cielo.png")
         nuevo_tamano_cielo = (800, 400)
         self.cielo = pygame.transform.scale(cielo_original, nuevo_tamano_cielo)
         self.score_rect=self.score.get_rect(center=(400,200))
@@ -329,20 +389,28 @@ class Juego():
                                     
                     for f in self.lista_plateros:
                         if  self.jugador_seleccionado.rectangulo.colliderect(f.rectangulo):
-                            if  len(self.jugador_seleccionado.inventario)>=1 and self.jugador_seleccionado.inventario[0].get_estado()==True:
+                            if  len(self.jugador_seleccionado.inventario)>=1:
+                                todos_true=True
                                 for a in self.jugador_seleccionado.inventario:
-                                    f.bandeja.append(a)
+                                    if a.get_estado()==False:
+                                        todos_true=False
+                                if todos_true:
+                                    for a in self.jugador_seleccionado.inventario:
+                                        f.bandeja.append(a)
                                 print ('El platero tiene: ')
                                 for a in f.bandeja:
                                     print ('platero',a)
-                                return self.jugador_seleccionado.dejar()
+                                self.jugador_seleccionado.inventario.clear()
+                                return
+                            
                             elif len(self.jugador_seleccionado.inventario)==0 and len(f.bandeja)!=0:
-                                    producto=f.get_bandeja()
                                     for q in f.bandeja:
                                         self.jugador_seleccionado.coger(q)
+                                    f.bandeja.clear()
                                     for a in self.jugador_seleccionado.inventario:
                                         print (a)
-                                    f.bandeja.clear()
+                                    
+                                    
                     
                     if len(self.jugador_seleccionado.inventario)==1 and len(self.hornouno.bandeja)==0:
                             if self.jugador_seleccionado.rectangulo.colliderect(self.hornouno.rectangulo):
@@ -379,17 +447,10 @@ class Juego():
                                     self.jugador_seleccionado.inventario.clear()
                                     print (self.jugador_seleccionado.inventario)
 
-                    if len(self.jugador_seleccionado.inventario)>=1:
-                            if self.jugador_seleccionado.rectangulo.colliderect(self.entrega.rectangulo):
-                                chequeo=True
-                                for producto in self.jugador_seleccionado.inventario:
-                                    if producto.get_estado()==False:
-                                        chequeo=False
-                                if chequeo:
-                                    for producto in self.jugador_seleccionado.inventario:
-                                            self.entrega.comparar(producto)
-
-                                    self.jugador_seleccionado.inventario.clear()
+                    if len(self.jugador_seleccionado.inventario) >= 1:
+                        if self.jugador_seleccionado.rectangulo.colliderect(self.entrega.rectangulo):
+                            self.entregar_pedido()
+                            return
                                    
                                 
                     elif len(self.jugador_seleccionado.inventario)==0:
@@ -401,7 +462,6 @@ class Juego():
                                     print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
 
     def dibujar_fondo(self):
-        
         self.screen.fill('Grey')       
         self.screen.blit(self.cielo,(0,0))#es como el place
     def dibujar(self):
@@ -425,13 +485,30 @@ class Juego():
             self.hornodos.dibujar(self.screen)
             tiempo_horno = self.hornouno.get_tiempo_restante()
             texto_horno = self.fuente.render(f"Horno: {tiempo_horno}", False, "Black")
-            self.screen.blit(texto_horno, (300, 100))
+            self.screen.blit(texto_horno, (300, 60))
         if self.tablauno.esta_cocinando():
             tiempo_tabla = self.tablauno.get_tiempo_restante()
             texto_tabla = self.fuente.render(f"Tabla: {tiempo_tabla}", False, "Black")
-            self.screen.blit(texto_tabla, (400, 100))
+            self.screen.blit(texto_tabla, (400, 60))
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
+        
+        y = 80
+        titulo = self.fuente.render("Receta:", False, "Black")
+        self.screen.blit(titulo, (810, y))
+
+        y += 25
+
+        for ingrediente, cantidad in self.receta_actual.ingredientes.items():
+            texto = self.fuente.render(f"{ingrediente} x{cantidad}", False, "Black")
+            self.screen.blit(texto, (810, y))
+            y += 25
+        puntos = self.puntaje
+        texto_puntos = self.fuente.render(f"Puntos: {puntos}", False, "Black")
+        self.screen.blit(texto_puntos, (810, 300))
+        tiempo_receta = self.temporizador_receta.mostrar_tiempo()
+        texto_tiempo_receta = self.fuente.render(f'Cambio: {tiempo_receta}',True , "Black")
+        self.screen.blit(texto_tiempo_receta, (805, y))
         self.screen.blit(self.score, self.score_rect)
         
 
@@ -439,6 +516,9 @@ class Juego():
         self.jugador_seleccionado.actualizar()
         self.hornouno.actualizar()
         self.tablauno.actualizar()
+        if self.temporizador_receta.terminar():
+            self.generar_receta()
+            self.temporizador_receta.iniciar()
         
         if self.temporizador.terminar():
             self.permitir = False
