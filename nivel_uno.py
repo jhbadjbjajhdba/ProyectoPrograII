@@ -292,9 +292,12 @@ class Juego():
             self.puntaje += 10
             print("Puntaje:", self.puntaje)
             self.jugador_seleccionado.inventario.clear()
-            
+            self.generar_receta()
+            self.temporizador_receta = Temporizador(25000)
+            self.temporizador_receta.iniciar()
         else:
             self.puntaje-=10
+            self.jugador_seleccionado.inventario.clear()
             
     def generar_receta(self):
         ingredientes_posibles = ["Bistec", "Ensalada"]
@@ -348,8 +351,7 @@ class Juego():
     def permitir_eventos(self):        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
+                self.permitir=False
             if event.type == pygame.KEYDOWN:
             
                 if event.key == pygame.K_r:
@@ -521,6 +523,7 @@ class Juego():
             self.dibujar()
             pygame.display.update()#actualiza el display
             self.clock.tick(60)#frames
+        pygame.display.quit()
             
     
         
@@ -528,28 +531,4 @@ class Juego():
     
 
 
-#===================================================================================================================            
-class PantallaPrincipal():
-    def __init__(self):
-        self.window = None
-    def empezar(self):
-        self.window.withdraw()
-        juego=Juego()
-        juego.correr()
-        
-    def inicializar(self):
-        self.window=tk.Tk()
-        self.window.geometry('800x400')
-        self.window.title('Undercooked')
-        self.window.resizable(False,False)
-        titulo=tk.Label()
-        boton_iniciar=tk.Button(self.window, text='Iniciar', font=('Papyrus',12),command=self.empezar)
-        titulo=tk.Label(self.window,text=('UNDERCOOKED: The Video Game'),fg='black',font=(35), compound='bottom')
-        titulo.place(x=100,y=10)
-        boton_iniciar.place(x=200,y=200)
-        self.window.mainloop()
-        
-    
-        
-pg=PantallaPrincipal()
-pg.inicializar()
+          
