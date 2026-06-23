@@ -327,9 +327,9 @@ class Juego():
         
     
     def crear_estaciones(self):
-        self.despensauno=Despensa_Tomate('mesa.png',(50,50),(100,50))
+        self.despensauno=Despensa_Tomate('tomate_despensa.png',(50,50),(100,50))
         self.lista_despensas.append(self.despensauno)
-        self.despensados=Despensa_Papa('mesa.png',(50,50),(10,250))
+        self.despensados=Despensa_Papa('cebolla_despensa.png',(50,50),(10,240))
         self.lista_despensas.append(self.despensados)
 
         self.hornouno=Horno('olla.jpeg',(50,50),(300,50))

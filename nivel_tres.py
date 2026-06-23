@@ -259,7 +259,7 @@ class Despensa():
     def get_localizacion(self):
         return self.localizacion
     
-class Despensa_Tomate(Despensa):
+class Despensa_Pez(Despensa):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
         self.producto=Proteina('Pez',5000)
@@ -402,9 +402,9 @@ class Juego():
         
     
     def crear_estaciones(self):
-        self.despensauno=Despensa_Tomate('mesa.png',(50,50),(100,50))
+        self.despensauno=Despensa_Pez('pezcado_despensa.png',(50,50),(100,50))
         self.lista_despensas.append(self.despensauno)
-        self.despensados=Despensa_Papa('mesa.png',(50,50),(10,250))
+        self.despensados=Despensa_Papa('papas_despensa.png',(50,50),(10,240))
         self.lista_despensas.append(self.despensados)
 
         self.hornouno=Freidora_Pescado('freidora.jpeg',(50,50),(280,50))
