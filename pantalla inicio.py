@@ -11,6 +11,7 @@ class PantallaPrincipal():
         self.window.withdraw()
         juego=nivel_uno.Juego()
         juego.correr()
+        
         self.window.deiconify()
         
     def empezar_dos(self):
@@ -36,6 +37,7 @@ class PantallaPrincipal():
         self.miniwindow.geometry('800x400')
         self.miniwindow.title('Undercooked: Tutorial')
         self.miniwindow.resizable(False,False)
+        infor=tk.Label(self.miniwindow,text=('Controles:\n-F: Botón de acción\n-R: Cambio de personaje\n-Flechas: Movilización '),fg='black',font=(35), compound='bottom')
         infor=tk.Label(self.miniwindow,text=('Controles:\n-F: Botón de acción\n-R: Cambio de personaje\n-Flechas: Movilización '),fg='black',font=(35), compound='bottom')
         infor.place(x=10,y=10)
         boton_volver=tk.Button(self.miniwindow, text='Volver', font=('Papyrus',12),command=self.volver)

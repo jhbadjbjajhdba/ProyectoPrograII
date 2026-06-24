@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 import tkinter as tk
 import random
+#___________________________________________________________________________________________________
 class Receta():
     def __init__(self, ingredientes):
         self.ingredientes = ingredientes
@@ -10,7 +11,7 @@ class Receta():
         for ingrediente, cantidad in self.ingredientes.items():
             print(ingrediente, "x", cantidad)
         
-        
+#________________________________________________________________________________________________________        
 class Temporizador():
     def __init__(self,duracion):
         self.tiempo_inicio=0
@@ -40,12 +41,16 @@ class Temporizador():
             return restante//1000
     def esta_activo(self):
         return self.activo
-
+#________________________________________________________________________________________________________________
     
 class Alimento():
-    def __init__(self,nombre,preparacion):
+    def __init__(self,nombre,preparacion,image,size,localizacion ):
         self.nombre=nombre
         self.preparacion=preparacion
+        original=pygame.image.load(image)
+        self.image= pygame.transform.scale(original, size)
+        self.localizacion=localizacion
+        self.rectangulo=self.image.get_rect(bottomleft=localizacion)
         
     def __str__(self):
         return self.nombre
@@ -55,32 +60,38 @@ class Alimento():
         return self.estado
     def get_nombre(self):
         return self.nombre
+    def dibujar(self, screen):
+        screen.blit(self.image, self.rectangulo)
         
     
  
 class Vegetal(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion):
+        super().__init__(nombre,preparacion,image,size,localizacion)
     def get_grupo_alimentario(self):
         return ('vegetal')
     def get_estado(self):
         return False
 
 class Puré(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion):
+        super().__init__(nombre,preparacion,image,size,localizacion)
     def get_grupo_alimentario(self):
         return ('pure')
     def get_estado(self):
         return ('Semilisto')
 
 class Sopa(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion):
+        super().__init__(nombre,preparacion,image,size,localizacion)
     def get_grupo_alimentario(self):
         return ('sopa')
     def get_estado(self):
         return ('True')
+#____________________________________________________________________________________________________
+
+
+    
 class Estacion():
     def __init__(self,image,size,localizacion):
         original=pygame.image.load(image)
@@ -129,9 +140,15 @@ class Tabla(Estacion):
             self.temporizador = Temporizador(producto.get_preparacion())
             self.temporizador.iniciar()
             print("Cortando vegetal...")
+            
     def actualizar(self):
         if self.temporizador.terminar():
-            pure = Puré("Puré de " + self.producto_a_cocinar.get_nombre(), 5000)
+            if self.producto_a_cocinar.get_nombre() == "Tomate":
+                pure = Puré("Puré de Tomate", 5000, "tomate_cortado.png", (30,30), (400,50))
+
+            elif self.producto_a_cocinar.get_nombre() == "Cebolla":
+                pure = Puré("Puré de Cebolla", 5000, "cebolla_cortada.png", (30,30), (400,50))
+
             self.bandeja.append(pure)
             self.producto_a_cocinar = None
             print("La tabla tiene:", self.bandeja[0])
@@ -155,10 +172,15 @@ class Horno(Estacion):
             self.temporizador = Temporizador(producto.get_preparacion())
             self.temporizador.iniciar()
             print("Hirviendo Puré...")
+
     def actualizar(self):
-    
         if self.temporizador.terminar():
-            sopa = Sopa("Sopa " + self.producto_a_cocinar.get_nombre(), 0)
+            if self.producto_a_cocinar.get_nombre() == "Puré de Tomate":
+                sopa = Sopa("Sopa Puré de Tomate", 0, "alimento_rojo.png", (30,30), (300,50))
+
+            elif self.producto_a_cocinar.get_nombre() == "Puré de Cebolla":
+                sopa = Sopa("Sopa Puré de Cebolla", 0, "alimento.png", (30,30), (300,50))
+
             self.bandeja.append(sopa)
             self.producto_a_cocinar = None
             print("El horno tiene:", self.bandeja[0])
@@ -169,7 +191,7 @@ class Horno(Estacion):
     def esta_cocinando(self):
         return self.temporizador.esta_activo()
     
-
+#_________________________________________________________________________________________________________
 
 class Despensa():
     def __init__(self,image,size,localizacion):
@@ -185,14 +207,14 @@ class Despensa():
 class Despensa_Tomate(Despensa):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
-        self.producto=Vegetal('Tomate',5000)
+        self.producto=Vegetal('Tomate',5000,'tomate.png',(30,30),(100,50))
     def get_producto(self):
         return self.producto
     
 class Despensa_Papa(Despensa):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
-        self.producto=Vegetal('Cebolla',5000)
+        self.producto=Vegetal('Cebolla',5000,'cebolla.png',(30,30),(10,240))
     def get_producto(self):
         return self.producto
     
@@ -216,6 +238,13 @@ class Jugador():
             self.rectangulo.x-=5
         if keys[pygame.K_RIGHT]:
             self.rectangulo.x+=5
+            
+    def dibujar_inventario(self, screen):
+        if len(self.inventario) > 0:
+            alimento = self.inventario[0]
+            alimento.rectangulo.midtop = self.rectangulo.midbottom
+            alimento.rectangulo.y -= 35
+            alimento.dibujar(screen)
      
     def get_inventario(self):
         return self.inventario
@@ -246,7 +275,7 @@ class Jugador():
         screen.blit(self.image, self.rectangulo)
 
         
-
+#_________________________________________________________________________________________
 
 class Juego():
     def __init__(self):
@@ -337,15 +366,17 @@ class Juego():
         self.lista_hornos.append(self.hornouno)
         self.lista_hornos.append(self.hornodos)
         self.tablauno=Tabla('cortadora_dos.png',(50,50),(400,50))
+        
+    
 
         self.basurero=Basurero('basurero.png',(50,50),(500,50))
 
-        self.entrega=Entrega('banda.png',(50,50),(600,50))
+        self.entrega=Entrega('banda_2.png',(50,80),(600,60))
         
-        for i in range (60,200,60):
+        for i in range (60,200,80):
             mesa=Mesa('mesa_trasera_dos.jpeg',(50,50),(10,i))
             self.lista_mesas.append(mesa)
-        for i in range (300,400,60):
+        for i in range (300,400,80):
             mesa=Mesa('mesa_trasera_dos.jpeg',(50,50),(10,i))
             self.lista_mesas.append(mesa)
             
@@ -353,7 +384,7 @@ class Juego():
             mesa=Mesa('mesa_trasera_dos.jpeg',(50,50),(x,400))
             self.lista_mesas.append(mesa)
 
-        for f in range (60,400,60):
+        for f in range (60,400,70):
             fer=Platero('platero_dos.jpeg',(50,50),(735,f))
             self.lista_plateros.append(fer)
                
@@ -478,13 +509,35 @@ class Juego():
         self.despensados.dibujar(self.screen)
         self.hornouno.dibujar(self.screen)
         self.hornodos.dibujar(self.screen)
+        for horno in self.lista_hornos:
+            for alimento in horno.bandeja:
+                alimento.rectangulo.center = horno.rectangulo.center
+                alimento.dibujar(self.screen)
         self.basurero.dibujar(self.screen)
         self.tablauno.dibujar(self.screen)
         self.entrega.dibujar(self.screen)
+
+        
+      
+        for a in self.tablauno.bandeja:
+            a.dibujar(self.screen)
+            
+        
         for i in self.lista_mesas:
             i.dibujar(self.screen)
         for f in self.lista_plateros:
             f.dibujar(self.screen)
+
+        for a in self.lista_mesas:
+            for q in a.bandeja:
+                q.rectangulo.center=a.rectangulo.center
+                q.dibujar(self.screen)
+                
+       
+        for a in self.lista_plateros:
+            for q in a.bandeja:
+                q.rectangulo.center=a.rectangulo.center
+                q.dibujar(self.screen)
         
         tiempo = self.temporizador.mostrar_tiempo()
         texto_tiempo = self.fuente.render(f"Tiempo: {tiempo}", False, "Black")
@@ -502,6 +555,9 @@ class Juego():
             self.screen.blit(texto_tabla, (400, 60))
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
+        self.uno.dibujar_inventario(self.screen)
+        self.dos.dibujar_inventario(self.screen)
+        
         
         y = 80
         titulo = self.fuente.render("Receta:", False, "Black")
