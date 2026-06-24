@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 import tkinter as tk
 import random
+import pantalla_inicio
 #___________________________________________________________________________________________________
 class Receta():
     def __init__(self, ingredientes):
@@ -87,7 +88,7 @@ class Sopa(Alimento):
     def get_grupo_alimentario(self):
         return ('sopa')
     def get_estado(self):
-        return ('True')
+        return True
 #____________________________________________________________________________________________________
 
 
@@ -329,7 +330,8 @@ class Juego():
 
         if inventario_contado == self.receta_actual.ingredientes:
             print("Pedido correcto")
-            self.puntaje += 10
+            for i in inventario_contado:
+                self.puntaje+=10
             print("Puntaje:", self.puntaje)
             self.jugador_seleccionado.inventario.clear()
             self.generar_receta()
@@ -431,16 +433,17 @@ class Juego():
                             if  len(self.jugador_seleccionado.inventario)>=1:
                                 todos_true=True
                                 for a in self.jugador_seleccionado.inventario:
-                                    if a.get_estado()==False:
-                                        todos_true=False
+                                    if a.get_estado()!=True:
+                                        todos_true==False
+                                    
                                 if todos_true:
                                     for a in self.jugador_seleccionado.inventario:
                                         f.bandeja.append(a)
-                                print ('El platero tiene: ')
-                                for a in f.bandeja:
-                                    print ('platero',a)
-                                self.jugador_seleccionado.inventario.clear()
-                                return
+                                        print ('El platero tiene: ')
+                                    for a in f.bandeja:
+                                        print ('platero',a)
+                                        self.jugador_seleccionado.inventario.clear()
+                                    return
                             
                             elif len(self.jugador_seleccionado.inventario)==0 and len(f.bandeja)!=0:
                                     for q in f.bandeja:
@@ -448,8 +451,7 @@ class Juego():
                                     f.bandeja.clear()
                                     for a in self.jugador_seleccionado.inventario:
                                         print (a)
-                                    
-                                    
+                                         
                     for f in self.lista_hornos:
                         if len(self.jugador_seleccionado.inventario)==1 and len(f.bandeja)==0:
                             if self.jugador_seleccionado.rectangulo.colliderect(f.rectangulo):
@@ -578,18 +580,31 @@ class Juego():
         self.screen.blit(self.score, self.score_rect)
         
 
+    
     def actualizar(self):
         self.jugador_seleccionado.actualizar()
-        for horno in self.lista_hornos:
-            horno.actualizar()
+        self.hornouno.actualizar()
         self.tablauno.actualizar()
         if self.temporizador_receta.terminar():
+            self.puntaje -= 10
             self.generar_receta()
             self.temporizador_receta.iniciar()
         
         if self.temporizador.terminar():
             self.permitir = False
-            
+
+    def mostrar_pantalla_final(self):
+        ventana = tk.Tk()
+        ventana.geometry("300x200")
+        ventana.title("Fin del nivel")
+
+        texto = tk.Label(ventana,text=f"Nivel terminado\nPuntaje: {self.puntaje}",font=("Arial", 20))
+        texto.pack(pady=40)
+
+        boton = tk.Button(ventana,text="Cerrar",font=("Arial", 12),command=pantalla_inicio.pg.inicializar)
+        boton.pack()
+        ventana.mainloop()
+        boton.pack_forget()
             
 
     def correr(self):
@@ -601,8 +616,8 @@ class Juego():
             pygame.display.update()#actualiza el display
             self.clock.tick(60)#frames
         pygame.display.quit()
+        self.mostrar_pantalla_final()
             
     
         
     
-
