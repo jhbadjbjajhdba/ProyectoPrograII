@@ -2,7 +2,7 @@ import pygame
 from sys import exit
 import tkinter as tk
 import random
-import pantalla_inicio
+
 #___________________________________________________________________________________
 class Receta():
     def __init__(self, ingredientes):
