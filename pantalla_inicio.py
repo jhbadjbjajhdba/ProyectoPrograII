@@ -11,7 +11,6 @@ class PantallaPrincipal():
         self.window.withdraw()
         juego=nivel_uno.Juego()
         juego.correr()
-        
         self.window.deiconify()
         
     def empezar_dos(self):

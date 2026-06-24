@@ -2,7 +2,6 @@ import pygame
 from sys import exit
 import tkinter as tk
 import random
-import pantalla_inicio
 #___________________________________________________________________________________________________
 class Receta():
     def __init__(self, ingredientes):
@@ -594,17 +593,18 @@ class Juego():
             self.permitir = False
 
     def mostrar_pantalla_final(self):
-        ventana = tk.Tk()
+        ventana = tk.Toplevel()
         ventana.geometry("300x200")
         ventana.title("Fin del nivel")
 
         texto = tk.Label(ventana,text=f"Nivel terminado\nPuntaje: {self.puntaje}",font=("Arial", 20))
         texto.pack(pady=40)
 
-        boton = tk.Button(ventana,text="Cerrar",font=("Arial", 12),command=pantalla_inicio.pg.inicializar)
+        boton = tk.Button(ventana,text="Cerrar",font=("Arial", 12),command=ventana.destroy)
         boton.pack()
-        ventana.mainloop()
-        boton.pack_forget()
+       
+        ventana.wait_window()
+        
             
 
     def correr(self):
