@@ -459,7 +459,7 @@ class Juego():
                                     
                     if self.jugador_seleccionado.rectangulo.colliderect(self.hornouno.rectangulo):            
                             if len(self.jugador_seleccionado.inventario)==1 and len(self.hornouno.bandeja)==0:
-                                if self.jugador_seleccionado.inventario[0].get_estado()==('Semilisto') and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('proteina'):
+                                if self.jugador_seleccionado.inventario[0].get_estado()==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('proteina'):
                                     elemento=self.jugador_seleccionado.inventario[0]
                                     del (self.jugador_seleccionado.inventario[0])
                                     return self.hornouno.cocinar(elemento)
@@ -563,7 +563,7 @@ class Juego():
                                     
                     if self.jugador_escogido.rectangulo.colliderect(self.hornouno.rectangulo):            
                             if len(self.jugador_escogido.inventario)==1 and len(self.hornouno.bandeja)==0:
-                                if self.jugador_escogido.inventario[0].get_estado()==('Semilisto') and self.jugador_escogido.inventario[0].get_grupo_alimentario()==('proteina'):
+                                if self.jugador_escogido.inventario[0].get_estado()==False and self.jugador_escogido.inventario[0].get_grupo_alimentario()==('proteina'):
                                     elemento=self.jugador_escogido.inventario[0]
                                     del (self.jugador_escogido.inventario[0])
                                     return self.hornouno.cocinar(elemento)

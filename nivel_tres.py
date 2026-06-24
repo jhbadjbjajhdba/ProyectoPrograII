@@ -286,7 +286,7 @@ class Despensa_Papa(Despensa):
         return self.producto
     
 
-        
+#____________________________________________________________________________________________________________        
 class Jugador():
     def __init__(self,image,size, position, inventario):
         original=pygame.image.load(image)
