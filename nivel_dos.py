@@ -365,7 +365,7 @@ class Juego():
         self.hornodos=Horno('olla.jpeg',(50,50),(230,50))
         self.lista_hornos.append(self.hornouno)
         self.lista_hornos.append(self.hornodos)
-        self.tablauno=Tabla('cortadora_dos.png',(50,50),(400,50))
+        self.tablauno=Tabla('tabla.png',(50,50),(400,50))
         
     
 
@@ -540,7 +540,7 @@ class Juego():
                 q.dibujar(self.screen)
         
         tiempo = self.temporizador.mostrar_tiempo()
-        texto_tiempo = self.fuente.render(f"Tiempo: {tiempo}", False, "Black")
+        texto_tiempo = self.fuente.render(f"Tiempo: {tiempo}", False, "Red")
         self.screen.blit(texto_tiempo, (810, 20))
         for f in self.lista_hornos:
             if f.esta_cocinando():

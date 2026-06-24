@@ -2,6 +2,7 @@ import pygame
 from sys import exit
 import tkinter as tk
 import random
+#___________________________________________________________________________________
 class Receta():
     def __init__(self, ingredientes):
         self.ingredientes = ingredientes
@@ -10,7 +11,7 @@ class Receta():
         for ingrediente, cantidad in self.ingredientes.items():
             print(ingrediente, "x", cantidad)
         
-        
+#________________________________________________________________________________________________       
 class Temporizador():
     def __init__(self,duracion):
         self.tiempo_inicio=0
@@ -41,11 +42,16 @@ class Temporizador():
     def esta_activo(self):
         return self.activo
 
+#__________________________________________________________________________________________________________
     
 class Alimento():
-    def __init__(self,nombre,preparacion):
+    def __init__(self,nombre,preparacion,image,size,localizacion):
         self.nombre=nombre
         self.preparacion=preparacion
+        original=pygame.image.load(image)
+        self.image= pygame.transform.scale(original, size)
+        self.localizacion=localizacion
+        self.rectangulo=self.image.get_rect(bottomleft=localizacion)
         
     def __str__(self):
         return self.nombre
@@ -55,54 +61,59 @@ class Alimento():
         return self.estado
     def get_nombre(self):
         return self.nombre
+    def dibujar(self, screen):
+        screen.blit(self.image, self.rectangulo)
         
 class Proteina(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion ):
+        super().__init__(nombre,preparacion,image,size,localizacion )
     def get_grupo_alimentario(self):
         return ('proteina')
     def get_estado(self):
         return False   
  
 class Vegetal(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion ):
+        super().__init__(nombre,preparacion,image,size,localizacion )
     def get_grupo_alimentario(self):
         return ('vegetal')
     def get_estado(self):
         return False
 
 class Papas_Cortadas(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion ):
+        super().__init__(nombre,preparacion,image,size,localizacion )
     def get_grupo_alimentario(self):
         return ('vegetal')
     def get_estado(self):
         return ('Semilisto')
 
 class Papas_Fritas(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion ):
+        super().__init__(nombre,preparacion,image,size,localizacion )
     def get_grupo_alimentario(self):
         return ('vegetal')
     def get_estado(self):
         return True
 
 class Pescado(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion ):
+        super().__init__(nombre,preparacion,image,size,localizacion )
     def get_grupo_alimentario(self):
         return ('proteina')
     def get_estado(self):
         return ('Semilisto')
     
 class Pescado_Empanizado(Alimento):
-    def __init__(self,nombre,preparacion):
-        super().__init__(nombre,preparacion)
+    def __init__(self,nombre,preparacion,image,size,localizacion ):
+        super().__init__(nombre,preparacion,image,size,localizacion )
     def get_grupo_alimentario(self):
         return ('proteina')
     def get_estado(self):
         return True
+
+
+#_________________________________________________________________________________________
     
 class Estacion():
     def __init__(self,image,size,localizacion):
@@ -121,6 +132,7 @@ class Mesa(Estacion):
             return self.bandeja[0]
         else:
             pass
+        
 class Entrega(Estacion):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
@@ -154,7 +166,7 @@ class Tabla_vegetales(Estacion):
             print("preparando ingrediente...")
     def actualizar(self):
         if self.temporizador.terminar():
-            papas_tiras = Papas_Cortadas('Papas cortadas', 5000)
+            papas_tiras = Papas_Cortadas('Papas cortadas', 5000,'papa_cortada.png',(30,30),(350,50))
             self.bandeja.append(papas_tiras)
             self.producto_a_cocinar = None
             print("La tabla tiene:", self.bandeja[0])
@@ -181,7 +193,7 @@ class Tabla_pescado(Estacion):
             print("preparando ingrediente...")
     def actualizar(self):
         if self.temporizador.terminar():
-            pescado_machacado = Pescado('Pescado', 5000)
+            pescado_machacado = Pescado('Pescado', 5000,'pezcado_cortado.png',(30,30),(410,50))
             self.bandeja.append(pescado_machacado)
             self.producto_a_cocinar = None
             print("La tabla tiene:", self.bandeja[0])
@@ -208,7 +220,7 @@ class Freidora_Pescado(Estacion):
     def actualizar(self):
     
         if self.temporizador.terminar():
-            pescado= Pescado_Empanizado('Pescado Empanizado', 0)
+            pescado= Pescado_Empanizado('Pescado Empanizado', 0,'frito.png',(30,30),(280,50))
             self.bandeja.append(pescado)
             self.producto_a_cocinar = None
             print("La freidora de pescado tiene:", self.bandeja[0])
@@ -235,7 +247,7 @@ class Freidora_Papas(Estacion):
     def actualizar(self):
     
         if self.temporizador.terminar():
-            fritas= Papas_Fritas('Papas Fritas', 0)
+            fritas= Papas_Fritas('Papas Fritas', 0,'papas_fritas.png',(30,30),(200,50) )
             self.bandeja.append(fritas)
             self.producto_a_cocinar = None
             print("La freidora de papas tiene:", self.bandeja[0])
@@ -262,14 +274,14 @@ class Despensa():
 class Despensa_Pez(Despensa):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
-        self.producto=Proteina('Pez',5000)
+        self.producto=Proteina('Pez',5000,'pezcado.png',(30,30),(100,50) )
     def get_producto(self):
         return self.producto
     
 class Despensa_Papa(Despensa):
     def __init__(self,image,size,localizacion):
         super().__init__(image,size,localizacion)
-        self.producto=Vegetal('Papas',5000)
+        self.producto=Vegetal('Papas',5000,'papa.png',(30,30),(10,240) )
     def get_producto(self):
         return self.producto
     
@@ -293,7 +305,14 @@ class Jugador():
             self.rectangulo.x-=5
         if keys[pygame.K_RIGHT]:
             self.rectangulo.x+=5
-     
+
+    def dibujar_inventario(self, screen):
+        if len(self.inventario) > 0:
+            alimento = self.inventario[0]
+            alimento.rectangulo.midtop = self.rectangulo.midbottom
+            alimento.rectangulo.y -= 35
+            alimento.dibujar(screen)
+    
     def get_inventario(self):
         return self.inventario
     
@@ -599,13 +618,49 @@ class Juego():
         self.tablauno.dibujar(self.screen)
         self.tablados.dibujar(self.screen)
         self.entrega.dibujar(self.screen)
+        
         for i in self.lista_mesas:
             i.dibujar(self.screen)
+
+
+        for a in self.lista_mesas:
+            for q in a.bandeja:
+                q.rectangulo.center=a.rectangulo.center
+                q.dibujar(self.screen)
+                
+        
         for f in self.lista_plateros:
             f.dibujar(self.screen)
+
+        for a in self.lista_plateros:
+            for q in a.bandeja:
+                q.rectangulo.center=a.rectangulo.center
+                q.dibujar(self.screen)
+                
+
+
+        for a in self.hornouno.bandeja:
+            a.rectangulo.center = self.hornouno.rectangulo.center
+            a.dibujar(self.screen)
+
+        for a in self.hornodos.bandeja:
+            a.rectangulo.center = self.hornodos.rectangulo.center
+            a.dibujar(self.screen)
+
+        for a in self.tablauno.bandeja:
+            a.rectangulo.center = self.tablauno.rectangulo.center
+            a.dibujar(self.screen)
+
+        for a in self.tablados.bandeja:
+            a.rectangulo.center = self.tablados.rectangulo.center
+            a.dibujar(self.screen)
+
+        
+
+        
         
         tiempo = self.temporizador.mostrar_tiempo()
-        texto_tiempo = self.fuente.render(f"Tiempo: {tiempo}", False, "Black")
+        texto_tiempo = self.fuente.render(f"Tiempo: {tiempo}", False, "Red")
         self.screen.blit(texto_tiempo, (810, 20))
         
         if self.hornouno.esta_cocinando():
@@ -637,6 +692,8 @@ class Juego():
             
         self.uno.dibujar(self.screen)
         self.dos.dibujar(self.screen)
+        self.uno.dibujar_inventario(self.screen)
+        self.dos.dibujar_inventario(self.screen)
         
         y = 80
         titulo = self.fuente.render("Receta:", False, "Black")

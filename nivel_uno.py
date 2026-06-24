@@ -3,6 +3,7 @@ from sys import exit
 import tkinter as tk
 import random
 
+
 class Receta():
     def __init__(self, ingredientes):
         self.ingredientes = ingredientes
