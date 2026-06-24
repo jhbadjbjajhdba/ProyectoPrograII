@@ -207,8 +207,42 @@ class Jugador():
         self.image= pygame.transform.scale(original, size)
         self.rectangulo=self.image.get_rect(bottomleft=position)
         self.inventario=inventario
-        
+    
+    def dibujar_inventario(self, screen):
+        if len(self.inventario) > 0:
+            alimento = self.inventario[0]
+            alimento.rectangulo.midtop = self.rectangulo.midbottom
+            alimento.rectangulo.y -= 35
+            alimento.dibujar(screen)
+    def get_inventario(self):
+        return self.inventario
+    def coger(self,producto):
+        self.inventario.append(producto)  
+    def dejar(self):
+        if len(self.inventario)!=0:
+            self.inventario.clear()    
+    def mantener_posicion(self):
+        if self.rectangulo.x==35:
+            self.rectangulo.x=40
+        if self.rectangulo.x==715:
+            self.rectangulo.x=710
+        if self.rectangulo.y==20:
+            self.rectangulo.y=25
+        if self.rectangulo.y==320:
+            self.rectangulo.y=315
+    def actualizar(self):
+        self.moverse()
+        self.mantener_posicion()
+    def dibujar(self, screen):
+        screen.blit(self.image, self.rectangulo)
 
+class Jugador_alpha(Jugador):
+    def __init__(self,image,size, position, inventario):
+        super().__init__(image,size, position, inventario)
+        original=pygame.image.load(image)
+        self.image= pygame.transform.scale(original, size)
+        self.rectangulo=self.image.get_rect(bottomleft=position)
+        self.inventario=inventario
     def moverse(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_UP]:
@@ -219,40 +253,26 @@ class Jugador():
             self.rectangulo.x-=5
         if keys[pygame.K_RIGHT]:
             self.rectangulo.x+=5
-    def dibujar_inventario(self, screen):
-        if len(self.inventario) > 0:
-            alimento = self.inventario[0]
-            alimento.rectangulo.midtop = self.rectangulo.midbottom
-            alimento.rectangulo.y -= 35
-            alimento.dibujar(screen)
-     
-    def get_inventario(self):
-        return self.inventario
-    
-    def coger(self,producto):
-        self.inventario.append(producto)
-        
-    def dejar(self):
-        if len(self.inventario)!=0:
-            self.inventario.clear()
-          
-    
-    def mantener_posicion(self):
-        if self.rectangulo.x==35:
-            self.rectangulo.x=40
-        if self.rectangulo.x==715:
-            self.rectangulo.x=710
-        if self.rectangulo.y==20:
-            self.rectangulo.y=25
-        if self.rectangulo.y==320:
-            self.rectangulo.y=315
 
-    def actualizar(self):
-        self.moverse()
-        self.mantener_posicion()
+                
+class Jugador_betha(Jugador):
+    def __init__(self,image,size, position, inventario):
+        super().__init__(image,size, position, inventario)
+        original=pygame.image.load(image)
+        self.image= pygame.transform.scale(original, size)
+        self.rectangulo=self.image.get_rect(bottomleft=position)
+        self.inventario=inventario
+    def moverse(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_w]:
+            self.rectangulo.y-=5
+        if keys[pygame.K_s]:
+            self.rectangulo.y+=5
+        if keys[pygame.K_a]:
+            self.rectangulo.x-=5
+        if keys[pygame.K_d]:
+            self.rectangulo.x+=5
 
-    def dibujar(self, screen):
-        screen.blit(self.image, self.rectangulo)
 
         
 #__________________________________________________________________________________________________________________________________________________
@@ -281,20 +301,31 @@ class Juego():
         self.permitir=True
         
     def crear_jugador(self):
-        self.uno=Jugador('uno.png',(60,60),(700,310),[])
-        self.dos=Jugador('dos.png',(60,60),(100,310),[])
-        self.jugador_seleccionado=self.uno
+        self.uno_alpha=Jugador_alpha('uno.png',(60,60),(700,310),[])
+        self.dos_alpha=Jugador_alpha('uno.png',(60,60),(100,310),[])
+        self.uno_betha=Jugador_betha('dos.png',(60,60),(500,310),[])
+        self.dos_betha=Jugador_betha('dos.png',(60,60),(670,45),[])
+        self.jugador_seleccionado=self.uno_alpha
+        self.jugador_escogido=self.uno_betha
+    
     
         
-    def cambiar_jugador(self):
-        if self.jugador_seleccionado == self.uno:
-            self.jugador_seleccionado = self.dos
+    def cambiar_jugador_alpha(self):
+        if self.jugador_seleccionado == self.uno_alpha:
+            self.jugador_seleccionado = self.dos_alpha
         else:
-            self.jugador_seleccionado = self.uno
+            self.jugador_seleccionado = self.uno_alpha
+
+    def cambiar_jugador_betha(self):
+        if self.jugador_escogido == self.uno_betha:
+            self.jugador_escogido = self.dos_betha
+        else:
+            self.jugador_escogido = self.uno_betha
             
-    def contar_inventario(self):
+            
+    def contar_inventario(self,jugador):
         conteo = {}
-        for producto in self.jugador_seleccionado.inventario:
+        for producto in jugador.inventario:
             nombre = producto.get_nombre()
             if nombre not in conteo:
                 conteo[nombre] = 1
@@ -302,21 +333,21 @@ class Juego():
                 conteo[nombre] += 1
         return conteo
     
-    def entregar_pedido(self):
-        inventario_contado = self.contar_inventario()
+    def entregar_pedido(self,jugador):
+        inventario_contado = self.contar_inventario(jugador)
 
         if inventario_contado == self.receta_actual.ingredientes:
             print("Pedido correcto")
             for i in inventario_contado:
                 self.puntaje+=10
             print("Puntaje:", self.puntaje)
-            self.jugador_seleccionado.inventario.clear()
+            jugador.inventario.clear()
             self.generar_receta()
             self.temporizador_receta = Temporizador(25000)
             self.temporizador_receta.iniciar()
         else:
             self.puntaje-=10
-            self.jugador_seleccionado.inventario.clear()
+            jugador.inventario.clear()
             
     def generar_receta(self):
         ingredientes_posibles = ["Bistec", "Ensalada"]
@@ -373,10 +404,16 @@ class Juego():
                 self.permitir=False
             if event.type == pygame.KEYDOWN:
             
+                if event.key == pygame.K_u:
+                    self.cambiar_jugador_alpha()
+
+                
+            
                 if event.key == pygame.K_r:
-                    self.cambiar_jugador()
+                    self.cambiar_jugador_betha()
                     
-                if event.key == pygame.K_f:
+                    
+                if event.key == pygame.K_j:
                     for i in self.lista_despensas:
                         if  self.jugador_seleccionado.rectangulo.colliderect(i.rectangulo) and len(self.jugador_seleccionado.inventario)==0:
                             producto=i.get_producto()
@@ -420,37 +457,46 @@ class Juego():
                                     for a in self.jugador_seleccionado.inventario:
                                         print (a)
                                     
-                                    
-                    
-                    if len(self.jugador_seleccionado.inventario)==1 and len(self.hornouno.bandeja)==0:
-                            if self.jugador_seleccionado.rectangulo.colliderect(self.hornouno.rectangulo):
-                                if self.jugador_seleccionado.inventario[0].estado==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('proteina'):
+                    if self.jugador_seleccionado.rectangulo.colliderect(self.hornouno.rectangulo):            
+                            if len(self.jugador_seleccionado.inventario)==1 and len(self.hornouno.bandeja)==0:
+                                if self.jugador_seleccionado.inventario[0].get_estado()==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('proteina'):
                                     elemento=self.jugador_seleccionado.inventario[0]
                                     del (self.jugador_seleccionado.inventario[0])
                                     return self.hornouno.cocinar(elemento)
                        
-                    elif len(self.jugador_seleccionado.inventario)==0:
-                            if len(self.hornouno.bandeja)==1:
-                                if  self.jugador_seleccionado.rectangulo.colliderect(self.hornouno.rectangulo):
-                                    producto=self.hornouno.bandeja[0]
-                                    self.jugador_seleccionado.coger(producto)
-                                    del (self.hornouno.bandeja[0])
-                                    print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+                            elif len(self.jugador_seleccionado.inventario)==0:
+                                if len(self.hornouno.bandeja)==1:
+                                    
+                                        producto=self.hornouno.bandeja[0]
+                                        self.jugador_seleccionado.coger(producto)
+                                        del (self.hornouno.bandeja[0])
+                                        print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
 
-                    if len(self.jugador_seleccionado.inventario)==1 and len(self.tablauno.bandeja)==0:
-                            if self.jugador_seleccionado.rectangulo.colliderect(self.tablauno.rectangulo):
-                                if self.jugador_seleccionado.inventario[0].estado==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('vegetal'):
-                                    elemento=self.jugador_seleccionado.inventario[0]
-                                    del (self.jugador_seleccionado.inventario[0])
-                                    return self.tablauno.cocinar(elemento)
+                
+
+
+
+                    if self.jugador_seleccionado.rectangulo.colliderect(self.tablauno.rectangulo):
+                        if len(self.jugador_seleccionado.inventario)==1 and len(self.tablauno.bandeja)==0:
+                            if self.jugador_seleccionado.inventario[0].get_estado()==False and self.jugador_seleccionado.inventario[0].get_grupo_alimentario()==('vegetal'):
+                                elemento=self.jugador_seleccionado.inventario[0]
+                                del (self.jugador_seleccionado.inventario[0])
+                                return self.tablauno.cocinar(elemento)
                        
-                    elif len(self.jugador_seleccionado.inventario)==0:
+                        elif len(self.jugador_seleccionado.inventario)==0:
                             if len(self.tablauno.bandeja)==1:
-                                if  self.jugador_seleccionado.rectangulo.colliderect(self.tablauno.rectangulo):
-                                    producto=self.tablauno.bandeja[0]
-                                    self.jugador_seleccionado.coger(producto)
-                                    del (self.tablauno.bandeja[0])
-                                    print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+                                producto=self.tablauno.bandeja[0]
+                                self.jugador_seleccionado.coger(producto)
+                                del (self.tablauno.bandeja[0])
+                                print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+
+
+
+
+
+
+
+
                                 
                     if len(self.jugador_seleccionado.inventario)>=1:
                             if self.jugador_seleccionado.rectangulo.colliderect(self.basurero.rectangulo):
@@ -459,7 +505,7 @@ class Juego():
 
                     if len(self.jugador_seleccionado.inventario) >= 1:
                         if self.jugador_seleccionado.rectangulo.colliderect(self.entrega.rectangulo):
-                            self.entregar_pedido()
+                            self.entregar_pedido(self.jugador_seleccionado)
                             return
                                    
                                 
@@ -470,7 +516,107 @@ class Juego():
                                     self.jugador_seleccionado.coger(producto)
                                     del (self.tablauno.bandeja[0])
                                     print (self.jugador_seleccionado.inventario[0],self.jugador_seleccionado.inventario[0].get_estado())
+#======================================================================================================================================================
+                if event.key == pygame.K_f:
+                    for i in self.lista_despensas:
+                        if  self.jugador_escogido.rectangulo.colliderect(i.rectangulo) and len(self.jugador_escogido.inventario)==0:
+                            producto=i.get_producto()
+                            self.jugador_escogido.coger(producto)
+                            print (self.jugador_escogido.inventario[0],self.jugador_escogido.inventario[0].get_estado())
+                        
+                    for j in self.lista_mesas:
+                        if  self.jugador_escogido.rectangulo.colliderect(j.rectangulo):
+                            if len(j.bandeja)==0 and len(self.jugador_escogido.inventario)==1:
+                                j.bandeja.append(self.jugador_escogido.inventario[0])
+                                print ('La mesa tiene: ',j.bandeja[0])
+                                return self.jugador_escogido.dejar()
+                            elif len(j.bandeja)==1 and len(self.jugador_escogido.inventario)==0:
+                                    producto=j.get_bandeja()
+                                    del (j.bandeja[0])
+                                    self.jugador_escogido.coger(producto)
+                                    print (self.jugador_escogido.inventario[0],self.jugador_escogido.inventario[0].get_estado())
+                            else:
+                                pass
+                                    
+                    for f in self.lista_plateros:
+                        if  self.jugador_escogido.rectangulo.colliderect(f.rectangulo):
+                            if  len(self.jugador_escogido.inventario)>=1:
+                                todos_true=True
+                                for a in self.jugador_escogido.inventario:
+                                    if a.get_estado()==False:
+                                        todos_true=False
+                                if todos_true:
+                                    for a in self.jugador_escogido.inventario:
+                                        f.bandeja.append(a)
+                                print ('El platero tiene: ')
+                                for a in f.bandeja:
+                                    print ('platero',a)
+                                self.jugador_escogido.inventario.clear()
+                                return
+                            
+                            elif len(self.jugador_escogido.inventario)==0 and len(f.bandeja)!=0:
+                                    for q in f.bandeja:
+                                        self.jugador_escogido.coger(q)
+                                    f.bandeja.clear()
+                                    for a in self.jugador_escogido.inventario:
+                                        print (a)
+                                    
+                    if self.jugador_escogido.rectangulo.colliderect(self.hornouno.rectangulo):            
+                            if len(self.jugador_escogido.inventario)==1 and len(self.hornouno.bandeja)==0:
+                                if self.jugador_escogido.inventario[0].get_estado()==False and self.jugador_escogido.inventario[0].get_grupo_alimentario()==('proteina'):
+                                    elemento=self.jugador_escogido.inventario[0]
+                                    del (self.jugador_escogido.inventario[0])
+                                    return self.hornouno.cocinar(elemento)
+                       
+                            elif len(self.jugador_escogido.inventario)==0:
+                                if len(self.hornouno.bandeja)==1:
+                                    
+                                        producto=self.hornouno.bandeja[0]
+                                        self.jugador_escogido.coger(producto)
+                                        del (self.hornouno.bandeja[0])
+                                        print (self.jugador_escogido.inventario[0],self.jugador_escogido.inventario[0].get_estado())
 
+                  
+
+
+
+
+
+
+
+                    if self.jugador_escogido.rectangulo.colliderect(self.tablauno.rectangulo):
+                        if len(self.jugador_escogido.inventario)==1 and len(self.tablauno.bandeja)==0:
+                            if self.jugador_escogido.inventario[0].get_estado()==False and self.jugador_escogido.inventario[0].get_grupo_alimentario()==('vegetal'):
+                                elemento=self.jugador_escogido.inventario[0]
+                                del (self.jugador_escogido.inventario[0])
+                                return self.tablauno.cocinar(elemento)
+                       
+                        elif len(self.jugador_escogido.inventario)==0:
+                            if len(self.tablauno.bandeja)==1:
+                                producto=self.tablauno.bandeja[0]
+                                self.jugador_escogido.coger(producto)
+                                del (self.tablauno.bandeja[0])
+                                print (self.jugador_escogido.inventario[0],self.jugador_escogido.inventario[0].get_estado())
+
+                                
+                    if len(self.jugador_escogido.inventario)>=1:
+                            if self.jugador_escogido.rectangulo.colliderect(self.basurero.rectangulo):
+                                    self.jugador_escogido.inventario.clear()
+                                    print (self.jugador_escogido.inventario)
+
+                    if len(self.jugador_escogido.inventario) >= 1:
+                        if self.jugador_escogido.rectangulo.colliderect(self.entrega.rectangulo):
+                            self.entregar_pedido(self.jugador_escogido)
+                            return
+                                   
+                                
+                    elif len(self.jugador_escogido.inventario)==0:
+                            if len(self.tablauno.bandeja)==1:
+                                if  self.jugador_escogido.rectangulo.colliderect(self.tablauno.rectangulo):
+                                    producto=self.tablauno.bandeja[0]
+                                    self.jugador_escogido.coger(producto)
+                                    del (self.tablauno.bandeja[0])
+                                    print (self.jugador_escogido.inventario[0],self.jugador_escogido.inventario[0].get_estado())
     def dibujar_fondo(self):
         self.screen.fill('Grey')       
         self.screen.blit(self.cielo,(0,0))#es como el place
@@ -518,10 +664,18 @@ class Juego():
             tiempo_tabla = self.tablauno.get_tiempo_restante()
             texto_tabla = self.fuente.render(f"Tabla: {tiempo_tabla}", False, "Black")
             self.screen.blit(texto_tabla, (400, 60))
-        self.uno.dibujar(self.screen)
-        self.dos.dibujar(self.screen)
-        self.uno.dibujar_inventario(self.screen)
-        self.dos.dibujar_inventario(self.screen)
+            
+        self.uno_alpha.dibujar(self.screen)
+        self.dos_alpha.dibujar(self.screen)
+
+        self.uno_betha.dibujar(self.screen)
+        self.dos_betha.dibujar(self.screen)
+        
+        self.uno_alpha.dibujar_inventario(self.screen)
+        self.dos_alpha.dibujar_inventario(self.screen)
+
+        self.uno_betha.dibujar_inventario(self.screen)
+        self.dos_betha.dibujar_inventario(self.screen)
         
         y = 80
         titulo = self.fuente.render("Receta:", False, "Black")
@@ -544,6 +698,7 @@ class Juego():
 
     def actualizar(self):
         self.jugador_seleccionado.actualizar()
+        self.jugador_escogido.actualizar()
         self.hornouno.actualizar()
         self.tablauno.actualizar()
         if self.temporizador_receta.terminar():
