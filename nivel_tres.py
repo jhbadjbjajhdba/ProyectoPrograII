@@ -426,28 +426,28 @@ class Juego():
         self.despensados=Despensa_Papa('papas_despensa.png',(50,50),(10,240))
         self.lista_despensas.append(self.despensados)
 
-        self.hornouno=Freidora_Pescado('freidora.jpeg',(50,50),(280,50))
-        self.hornodos=Freidora_Papas('freidora.jpeg',(50,50),(200,50))
+        self.hornouno=Freidora_Pescado('freidora_pez.png',(50,50),(280,50))
+        self.hornodos=Freidora_Papas('freidora_papa.png',(50,50),(200,50))
         
-        self.tablauno=Tabla_vegetales('cortadora_tres.png',(50,50),(350,50))
-        self.tablados=Tabla_pescado('cortadora_tres.png',(50,50),(410,50))
+        self.tablauno=Tabla_vegetales('tabla_papa.png',(50,50),(350,50))
+        self.tablados=Tabla_pescado('tabla_pescado.png',(50,50),(420,50))
 
         self.basurero=Basurero('basurero.png',(50,50),(500,50))
 
-        self.entrega=Entrega('banda.png',(50,50),(600,50))
+        self.entrega=Entrega('banda_3.png',(50,80),(600,60))
         
-        for i in range (60,200,60):
+        for i in range (60,200,80):
             mesa=Mesa('mesa_trasera_tres.jpeg',(50,50),(10,i))
             self.lista_mesas.append(mesa)
-        for i in range (300,400,60):
+        for i in range (300,400,80):
             mesa=Mesa('mesa_trasera_tres.jpeg',(50,50),(10,i))
             self.lista_mesas.append(mesa)
             
-        for x in range (70,720,75):
+        for x in range (70,720,90):
             mesa=Mesa('mesa_trasera_tres.jpeg',(50,50),(x,400))
             self.lista_mesas.append(mesa)
 
-        for f in range (60,400,60):
+        for f in range (60,400,90):
             fer=Platero('platero_tres.jpeg',(50,50),(735,f))
             self.lista_plateros.append(fer)
                
