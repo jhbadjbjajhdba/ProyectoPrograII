@@ -307,7 +307,8 @@ class Juego():
 
         if inventario_contado == self.receta_actual.ingredientes:
             print("Pedido correcto")
-            self.puntaje += 10
+            for i in inventario_contado:
+                self.puntaje+=10
             print("Puntaje:", self.puntaje)
             self.jugador_seleccionado.inventario.clear()
             self.generar_receta()
@@ -546,11 +547,26 @@ class Juego():
         self.hornouno.actualizar()
         self.tablauno.actualizar()
         if self.temporizador_receta.terminar():
+            self.puntaje -= 10
             self.generar_receta()
             self.temporizador_receta.iniciar()
         
         if self.temporizador.terminar():
             self.permitir = False
+
+    def mostrar_pantalla_final(self):
+        ventana = tk.Toplevel()
+        ventana.geometry("300x200")
+        ventana.title("Fin del nivel")
+
+        texto = tk.Label(ventana,text=f"Nivel terminado\nPuntaje: {self.puntaje}",font=("Arial", 20))
+        texto.pack(pady=40)
+
+        boton = tk.Button(ventana,text="Cerrar",font=("Arial", 12),command=ventana.destroy)
+        boton.pack()
+       
+        ventana.wait_window()
+        
             
 
     def correr(self):
@@ -562,6 +578,9 @@ class Juego():
             pygame.display.update()#actualiza el display
             self.clock.tick(60)#frames
         pygame.display.quit()
+        self.mostrar_pantalla_final()
+        
+        
             
     
         
