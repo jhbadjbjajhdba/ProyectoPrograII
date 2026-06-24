@@ -407,9 +407,9 @@ class Juego():
         else:
             self.jugador_escogido = self.uno_betha
             
-    def contar_inventario(self):
+    def contar_inventario(self,jugador):
         conteo = {}
-        for producto in self.jugador_seleccionado.inventario:
+        for producto in jugador.inventario:
             nombre = producto.get_nombre()
             if nombre not in conteo:
                 conteo[nombre] = 1
@@ -417,22 +417,22 @@ class Juego():
                 conteo[nombre] += 1
         return conteo
     
-    def entregar_pedido(self):
-        inventario_contado = self.contar_inventario()
+    def entregar_pedido(self,jugador):
+        inventario_contado = self.contar_inventario(jugador)
 
         if inventario_contado == self.receta_actual.ingredientes:
             print("Pedido correcto")
             for i in inventario_contado:
                 self.puntaje+=10
             print("Puntaje:", self.puntaje)
-            self.jugador_seleccionado.inventario.clear()
+            jugador.inventario.clear()
             self.generar_receta()
             self.temporizador_receta = Temporizador(25000)
             self.temporizador_receta.iniciar()
             
         else:
             self.puntaje-=10
-            self.jugador_seleccionado.inventario.clear()
+            jugador.inventario.clear()
     def generar_receta(self):
         ingredientes_posibles = ["Pescado Empanizado", "Papas Fritas"]
         receta = {}
@@ -628,7 +628,7 @@ class Juego():
 
                     if len(self.jugador_seleccionado.inventario) >= 1:
                         if self.jugador_seleccionado.rectangulo.colliderect(self.entrega.rectangulo):
-                            self.entregar_pedido()
+                            self.entregar_pedido(self.jugador_seleccionado)
                             return
                                    
                                 
@@ -703,7 +703,7 @@ class Juego():
                             if len(self.jugador_escogido.inventario)==1 and len(self.hornodos.bandeja)==0:
                             
                                 if self.jugador_escogido.inventario[0].get_estado()==('Semilisto') and self.jugador_escogido.inventario[0].get_grupo_alimentario()==('vegetal'):
-                                    elemento=self.jugador_seleccionado.inventario[0]
+                                    elemento=self.jugador_escogido.inventario[0]
                                     del (self.jugador_escogido.inventario[0])
                                     return self.hornodos.cocinar(elemento)
                        
@@ -765,7 +765,7 @@ class Juego():
 
                     if len(self.jugador_escogido.inventario) >= 1:
                         if self.jugador_escogido.rectangulo.colliderect(self.entrega.rectangulo):
-                            self.entregar_pedido()
+                            self.entregar_pedido(self.jugador_escogido)
                             return
                                    
                                 
