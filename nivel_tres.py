@@ -2,7 +2,6 @@ import pygame
 from sys import exit
 import tkinter as tk
 import random
-
 #___________________________________________________________________________________
 class Receta():
     def __init__(self, ingredientes):
@@ -897,8 +896,11 @@ class Juego():
     
     def actualizar(self):
         self.jugador_seleccionado.actualizar()
+        self.jugador_escogido.actualizar()
+        self.hornodos.actualizar()
         self.hornouno.actualizar()
         self.tablauno.actualizar()
+        self.tablados.actualizar()
         if self.temporizador_receta.terminar():
             self.puntaje -= 10
             self.generar_receta()
