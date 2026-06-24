@@ -381,7 +381,7 @@ class Juego():
         self.lista_recetas=[]
         self.puntaje=0
         self.generar_receta()
-        self.temporizador=Temporizador(3000)
+        self.temporizador=Temporizador(100000)
         self.temporizador.iniciar()
         self.temporizador_receta = Temporizador(25000)
         self.temporizador_receta.iniciar()
